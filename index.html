@@ -914,7 +914,7 @@ function renderGallery() {
     const delay = Math.min(i * 0.04, 0.6);
     return `<div class="gallery-item" data-index="${i}" style="animation-delay:${delay}s">
       ${isVideo
-        ? `<video src="${fileUrl}" muted preload="metadata" playsinline loop></video><div class="video-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>MP4</div>`
+        ? `<video src="${fileUrl}" muted preload="auto" playsinline loop></video><div class="video-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>MP4</div>`
         : `<img src="${p.sample_url || p.preview_url || fileUrl}" alt="" loading="lazy">`
       }
       <div class="gallery-overlay">
@@ -932,35 +932,22 @@ function renderGallery() {
     const video = el.querySelector('video');
     if (video) {
       let cycleTimeout = null;
-      let isHovering = false;
-
-      function playVideo() {
-        video.muted = true;
-        video.play().catch(() => {});
-      }
 
       function startCycle() {
-        isHovering = true;
-        video.load();
-        video.addEventListener('canplay', function onReady() {
-          video.removeEventListener('canplay', onReady);
-          if (!isHovering) return;
-          playVideo();
-          cycleTimeout = setTimeout(function tick() {
-            if (!isHovering) return;
-            video.pause();
-            video.currentTime += 10;
-            cycleTimeout = setTimeout(() => {
-              if (!isHovering) return;
-              playVideo();
-              cycleTimeout = setTimeout(tick, 3000);
-            }, 200);
-          }, 3000);
-        });
+        video.currentTime = 0;
+        video.muted = true;
+        video.play().catch(() => {});
+        cycleTimeout = setTimeout(function tick() {
+          video.pause();
+          video.currentTime += 10;
+          cycleTimeout = setTimeout(() => {
+            video.play().catch(() => {});
+            cycleTimeout = setTimeout(tick, 3000);
+          }, 200);
+        }, 3000);
       }
 
       function stopCycle() {
-        isHovering = false;
         clearTimeout(cycleTimeout);
         video.pause();
         video.currentTime = 0;
