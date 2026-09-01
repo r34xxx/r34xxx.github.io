@@ -28,15 +28,18 @@
   --safe:     #3a9d6e;
   --quest:    #c49a2a;
   --expl:     #d94848;
-  --r:        10px;
-  --r-lg:     16px;
+  --r:        12px;
+  --r-lg:     20px;
+  --glass:     rgba(21,28,38,.55);
+  --glass-brd: rgba(255,255,255,.09);
+  --glass-hi:  rgba(255,255,255,.05);
   --mono:     'JetBrains Mono', monospace;
   --sans:     'Inter', system-ui, sans-serif;
-  --shadow:   0 12px 40px rgba(0,0,0,.6);
+  --shadow:   0 18px 50px rgba(0,0,0,.5);
   --ease:     cubic-bezier(.22,.68,0,1.2);
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -46,23 +49,29 @@ body {
   overflow-x: hidden;
 }
 body.lb-open { overflow: hidden; }
+body.gate-open { overflow: hidden; }
 
 ::selection { background: var(--accent); color: #fff; }
+/* FIX: Firefox ignores ::-webkit-scrollbar — standard properties give it
+   the same slim, dark scrollbar (the scrollbar-width:none overrides on
+   .fbar-in/.lb-tags still win the cascade where hidden is intended) */
+* { scrollbar-width: thin; scrollbar-color: var(--border2) var(--bg); }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; border: 2px solid var(--bg); }
 
-button { font-family: var(--sans); color: inherit; background: none; border: none; cursor: pointer; }
-input, select { font-family: var(--sans); color: var(--text); }
+button { font-family: var(--sans); color: inherit; background: none; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+input, select { font-family: var(--sans); color: var(--text); -webkit-tap-highlight-color: transparent; }
 svg { display: block; flex-shrink: 0; }
-a { color: inherit; text-decoration: none; }
+a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 
 /* ── TOPBAR ─────────────────────────────────── */
 .topbar {
   position: sticky; top: 0; z-index: 200;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(10,14,20,.5);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 1px solid var(--glass-brd);
 }
 .topbar-in {
   max-width: 1680px; margin: 0 auto;
@@ -79,7 +88,8 @@ a { color: inherit; text-decoration: none; }
 .searchbar {
   display: flex; align-items: center; gap: 8px;
   height: 40px; padding: 0 6px 0 12px;
-  background: var(--sur); border: 1px solid var(--border);
+  background: var(--glass-hi); border: 1px solid var(--glass-brd);
+  backdrop-filter: blur(16px) saturate(160%);
   border-radius: var(--r); transition: border-color .2s, box-shadow .2s;
 }
 .searchbar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--acc-dim); }
@@ -110,7 +120,8 @@ a { color: inherit; text-decoration: none; }
 /* dropdown */
 .drop {
   position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-  background: var(--sur); border: 1px solid var(--border2);
+  background: var(--glass); backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid var(--glass-brd);
   border-radius: var(--r); box-shadow: var(--shadow);
   overflow: hidden auto; max-height: 300px; z-index: 300; display: none;
 }
@@ -143,7 +154,7 @@ a { color: inherit; text-decoration: none; }
 .fg { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .flbl { font-size: 11px; font-weight: 700; color: var(--faint); letter-spacing: .05em; }
 .seg {
-  display: flex; background: var(--bg); border: 1px solid var(--border);
+  display: flex; background: var(--glass-hi); border: 1px solid var(--glass-brd);
   border-radius: 9px; padding: 3px; gap: 2px;
 }
 .seg button {
@@ -218,13 +229,14 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 .gallery {
   max-width: 1680px; margin: 0 auto;
   padding: 6px 18px 24px;
-  columns: var(--cardw, 230px); column-gap: 12px;
+  display: flex; align-items: flex-start; gap: 12px;
 }
+.gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
 .card {
   break-inside: avoid; margin-bottom: 12px;
   position: relative; border-radius: var(--r);
-  overflow: hidden; background: var(--sur);
-  border: 1px solid var(--border);
+  overflow: hidden; background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
   cursor: pointer; content-visibility: auto;
   contain-intrinsic-size: auto 300px;
   transition: transform .25s var(--ease), border-color .2s, box-shadow .2s;
@@ -301,7 +313,9 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 /* ── LIGHTBOX ───────────────────────────────── */
 .lb {
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(4,6,9,.96);
+  background: rgba(4,6,9,.72);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   display: flex; flex-direction: column;
   animation: lbin .2s ease;
 }
@@ -331,10 +345,19 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
   --plyr-video-controls-background: rgba(8,11,16,.9);
   --plyr-control-icon-size: 15px;
   --plyr-font-size: 12px;
+  --plyr-range-thumb-height: 13px;
+  --plyr-range-track-height: 5px;
   border-radius: var(--r); overflow: hidden; background: #000;
   max-height: calc(100vh - 80px);
+  max-height: calc(100dvh - 80px); /* FIX: mobile URL bar makes 100vh too tall */
 }
-.plyr video { max-height: calc(100vh - 80px); }
+.plyr video { max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); }
+
+/* FIX: mobile - no volume slider, progress gets the width */
+@media (hover: none), (max-width: 640px) {
+  .plyr__volume { display: none; }
+  .plyr__controls { padding: 6px 10px; }
+}
 
 /* no-media fallback */
 .lb-err {
@@ -348,8 +371,9 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 /* nav & close */
 .lb-close, .lb-nav {
   position: absolute; z-index: 10;
-  width: 42px; height: 42px; border-radius: 11px;
-  background: rgba(14,19,24,.85); border: 1px solid var(--border2);
+  width: 42px; height: 42px; border-radius: 14px;
+  background: var(--glass); backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); border: 1px solid var(--glass-brd);
   color: var(--text); display: flex; align-items: center; justify-content: center;
   transition: background .15s, border-color .15s;
 }
@@ -364,19 +388,22 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 .zoomctl {
   position: absolute; top: 12px; left: 12px; z-index: 10;
   display: flex; align-items: center; gap: 2px;
-  background: rgba(14,19,24,.85); border: 1px solid var(--border2);
-  border-radius: 11px; padding: 3px;
+  background: var(--glass); backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); border: 1px solid var(--glass-brd);
+  border-radius: 14px; padding: 3px;
 }
 .zoomctl .ibtn { width: 32px; height: 32px; border-radius: 8px; }
 .zlvl { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--dim); min-width: 40px; text-align: center; }
 
 /* bottom bar */
 .lb-bar {
-  height: 60px; flex-shrink: 0;
+  height: calc(60px + env(safe-area-inset-bottom, 0px)); flex-shrink: 0;
   display: flex; align-items: center; gap: 12px;
   padding: 0 14px;
-  background: rgba(8,11,16,.92); backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom, 0px); /* FIX: notched phones */
+  background: rgba(10,14,20,.55); backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border-top: 1px solid var(--glass-brd);
 }
 .lb-count { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--dim); flex-shrink: 0; }
 .lb-count b { color: var(--text); }
@@ -395,12 +422,15 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 /* ── SETTINGS MODAL ─────────────────────────── */
 .overlay {
   position: fixed; inset: 0; z-index: 600;
-  background: rgba(4,6,9,.75); backdrop-filter: blur(5px);
+  background: rgba(4,6,9,.45); backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
   display: flex; align-items: center; justify-content: center; padding: 16px;
 }
 .modal-card {
-  width: min(500px, 100%); max-height: 82vh; overflow-y: auto;
-  background: var(--sur); border: 1px solid var(--border2);
+  width: min(500px, 100%); max-height: 82vh; max-height: 82dvh;
+  overflow-y: auto;
+  background: rgba(20,27,37,.6); backdrop-filter: blur(30px) saturate(170%);
+  -webkit-backdrop-filter: blur(30px) saturate(170%); border: 1px solid var(--glass-brd);
   border-radius: var(--r-lg); box-shadow: var(--shadow);
   animation: pop .22s var(--ease);
 }
@@ -425,16 +455,34 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 .danger { height: 32px; padding: 0 13px; border-radius: 9px; border: 1px solid var(--border2); color: var(--dim); font-size: 12px; font-weight: 700; transition: all .15s; }
 .danger:hover { border-color: var(--expl); color: var(--expl); }
 
+/* ── AGE GATE ───────────────────────────────── */
+.agegate { z-index: 9999; }
+.ag-card { text-align: center; padding: 34px 28px 28px; }
+.ag-ico {
+  width: 74px; height: 74px; margin: 0 auto 18px;
+  border-radius: 22px; display: flex; align-items: center; justify-content: center;
+  background: rgba(217,72,72,.12); border: 1px solid rgba(217,72,72,.4); color: var(--expl);
+}
+.ag-card h2 { font-size: 21px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 10px; }
+.ag-card p { color: var(--dim); font-size: 13.5px; margin-bottom: 24px; line-height: 1.6; }
+.ag-btns { display: flex; flex-direction: column; gap: 9px; }
+.ag-btns button { height: 44px; border-radius: 11px; font-weight: 800; font-size: 13.5px; transition: filter .15s, transform .1s, color .15s, border-color .15s; }
+.ag-btns button:active { transform: scale(.97); }
+.ag-yes { background: var(--accent); color: #fff; }
+.ag-yes:hover { filter: brightness(1.1); }
+.ag-no { background: none; border: 1px solid var(--border2); color: var(--dim); }
+.ag-no:hover { color: var(--expl); border-color: var(--expl); }
+
 /* ── TOASTS ─────────────────────────────────── */
 .toasts { position: fixed; right: 12px; bottom: 12px; z-index: 900; display: flex; flex-direction: column; gap: 7px; max-width: min(340px, calc(100vw - 24px)); }
-.toast { display: flex; align-items: center; gap: 9px; padding: 10px 13px; border-radius: var(--r); background: var(--sur3); border: 1px solid var(--border2); border-left: 3px solid var(--accent); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; animation: tin .25s var(--ease); }
+.toast { display: flex; align-items: center; gap: 9px; padding: 10px 13px; border-radius: var(--r); background: rgba(24,32,43,.6); backdrop-filter: blur(20px) saturate(160%); border: 1px solid var(--glass-brd); border-left: 3px solid var(--accent); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; animation: tin .25s var(--ease); }
 .toast.err { border-left-color: var(--expl); }
 .toast.ok  { border-left-color: var(--safe); }
 .toast.bye { opacity: 0; transform: translateX(16px); transition: all .22s; }
 @keyframes tin { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
 
 /* to top */
-.totop { position: fixed; right: 14px; bottom: 60px; z-index: 90; width: 42px; height: 42px; border-radius: 11px; background: var(--sur3); border: 1px solid var(--border2); color: var(--text); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transform: translateY(6px); transition: all .22s var(--ease); }
+.totop { position: fixed; right: 14px; bottom: 60px; z-index: 90; width: 42px; height: 42px; border-radius: 14px; background: var(--glass); backdrop-filter: blur(18px) saturate(160%); border: 1px solid var(--glass-brd); color: var(--text); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transform: translateY(6px); transition: all .22s var(--ease); }
 .totop.show { opacity: 1; pointer-events: auto; transform: none; }
 .totop:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -451,19 +499,32 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 @media (max-width: 860px) {
   .topbar-in { padding: 9px 12px; }
   .searchwrap { order: 3; flex-basis: 100%; max-width: none; }
-  .gallery { padding: 4px 10px 12px; column-gap: 8px; }
+  .gallery { padding: 4px 10px 12px; gap: 8px; }
   .card { margin-bottom: 8px; }
   .tagsbar, .toolbar { padding-left: 12px; padding-right: 12px; }
-  .fbar-in { padding: 7px 12px; }
+  /* FIX: filters wrap into rows on mobile instead of one awkward scrollbar */
+  .fbar-in { padding: 7px 12px; flex-wrap: wrap; overflow-x: visible; row-gap: 6px; }
   .lb-stage { padding: 8px 52px; }
   .lb-nav { width: 36px; height: 36px; top: auto; bottom: 72px; transform: none; }
   .lb-nav.prev { left: 8px; } .lb-nav.next { right: 8px; }
-  .lb-bar { height: 54px; gap: 8px; }
+  .lb-bar { height: calc(54px + env(safe-area-inset-bottom, 0px)); gap: 8px; }
   .lb-tags { display: none; }
   .lb-close { top: 8px; right: 8px; }
   .zoomctl { top: 8px; left: 8px; }
+  /* FIX: iOS Safari zooms any focused input with font-size < 16px */
+  .searchbar input, .bl-add input { font-size: 16px; }
 }
-@media (max-width: 480px) { :root { --cardw: 155px; } }
+/* FIX: phones — kill the dead ~104px side padding so media fills the screen,
+   and keep fixed overlays inside narrow viewports */
+@media (max-width: 600px) {
+  .lb-stage { padding: 8px 8px 64px; }
+  .dbg { width: min(270px, calc(100vw - 24px)); }
+  .totop { right: 10px; bottom: 56px; }
+}
+/* FIX: touch devices can't hover — always show score/resolution overlay */
+@media (hover: none) {
+  .cmeta { opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -491,14 +552,6 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 <!-- FILTER BAR -->
 <div class="fbar" id="fbar" hidden>
   <div class="fbar-in">
-    <div class="fg"><span class="flbl">Rating</span>
-      <div class="seg" id="segRating">
-        <button data-v="all" class="on">All</button>
-        <button data-v="safe">Safe</button>
-        <button data-v="questionable">Quest</button>
-        <button data-v="explicit">Explicit</button>
-      </div>
-    </div>
     <div class="fg"><span class="flbl">Type</span>
       <div class="seg" id="segType">
         <button data-v="all" class="on">All</button>
@@ -548,6 +601,19 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
   <h2>Find something</h2>
   <p>Type a tag above, or start from one of these suggestions. Filters and blacklist are in the top bar.</p>
   <div class="sugg" id="sugg"></div>
+</div>
+
+<!-- AGE GATE -->
+<div class="overlay agegate" id="ageGate" hidden>
+  <div class="modal-card ag-card">
+    <div class="ag-ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-1.71-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <h2>This site contains adult content</h2>
+    <p>This website hosts explicit material and is intended for adults only. By entering, you confirm that you are at least 18 years old (or the age of majority where you live) and that viewing adult content is legal in your jurisdiction.</p>
+    <div class="ag-btns">
+      <button id="ageYes" class="ag-yes">I am 18 or older &mdash; Enter</button>
+      <button id="ageNo" class="ag-no">I am under 18</button>
+    </div>
+  </div>
 </div>
 
 <!-- LIGHTBOX -->
@@ -615,7 +681,7 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 <button class="totop" id="toTop"></button>
 
 <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4/dist/panzoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.6.2/dist/panzoom.min.js"></script>
 <script>
 'use strict';
 
@@ -719,10 +785,16 @@ function toast(msg, type = '', action) {
 const S = {
   tags: [], sort: 'score', page: 0, posts: [], seen: new Set(),
   loading: false, hasMore: false,
-  settings: Object.assign(
-    { rating: 'all', type: 'all', minScore: 0, ai: true, card: 'm', previews: true },
-    LS.get('settings', {})
-  ),
+  // FIX: this is an r34 viewer - explicit is the sensible default rating.
+  // SETTINGS_VER bump discards stale saved prefs (e.g. old 'all' default).
+  settings: (() => {
+    const saved = LS.get('settings_ver') === 2 ? LS.get('settings', {}) : {};
+    LS.set('settings_ver', 2);
+    return Object.assign(
+      { type: 'all', minScore: 0, ai: true, card: 'm', previews: true },
+      saved
+    );
+  })(),
   blacklist: LS.get('blacklist', []),
   hist:      LS.get('hist', []),
   lb: { i: -1, pz: null, plyr: null, wheelFn: null },
@@ -775,7 +847,7 @@ async function fetchJSON(url, tries = 3) {
 
 function buildTagStr() {
   const t = [...S.tags], st = S.settings;
-  if (st.rating !== 'all')  t.push('rating:' + st.rating);
+  t.push('rating:explicit'); // r34 - explicit only, selector removed
   if (st.type === 'video')  t.push('video');
   if (st.type === 'gif')    t.push('animated', '-video');
   if (st.type === 'image')  t.push('-animated', '-video');
@@ -812,7 +884,6 @@ function writeHash() {
   if (S.tags.length) p.set('q', S.tags.join(' '));
   if (S.sort !== 'score') p.set('sort', S.sort);
   const st = S.settings;
-  if (st.rating !== 'all') p.set('rating', st.rating);
   if (st.type   !== 'all') p.set('type', st.type);
   if (st.minScore > 0)     p.set('min', st.minScore);
   if (!st.ai)              p.set('ai', '0');
@@ -824,7 +895,6 @@ function readHash() {
   if (p.get('q'))      S.tags = p.get('q').split(' ').filter(Boolean);
   if (p.get('sort'))   S.sort = p.get('sort');
   const st = S.settings;
-  if (p.get('rating')) st.rating   = p.get('rating');
   if (p.get('type'))   st.type     = p.get('type');
   if (p.get('min'))    st.minScore = +p.get('min');
   if (p.get('ai') === '0') st.ai  = false;
@@ -839,7 +909,7 @@ const emptyEl   = $('empty');
 
 function doSearch() {
   S.page = 0; S.posts = []; S.seen.clear(); S.hasMore = true;
-  gallery.innerHTML = '';
+  clearGallery();
   emptyEl.hidden = true;
   toolbar.hidden = false;
   feedfoot.hidden = false;
@@ -871,7 +941,7 @@ async function loadMore() {
     const d = document.createElement('div');
     d.className = 'card skel';
     d.innerHTML = '<div class="thumb" style="aspect-ratio:4/5"></div>';
-    gallery.appendChild(d);
+    placeCard(d);
     return d;
   });
 
@@ -899,7 +969,7 @@ async function loadMore() {
     fresh.forEach(p => {
       S.seen.add(p.id);
       S.posts.push(p);
-      gallery.appendChild(cardEl(p));
+      placeCard(cardEl(p));
     });
 
     S.page++;
@@ -948,6 +1018,49 @@ addEventListener('scroll', () => {
 $('toTop').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
 
 /* ══ CARDS ═══════════════════════════════════════════════════════════ */
+/* GALLERY MASONRY - row-first (left to right) fill.
+   CSS columns fill top-to-bottom per column, so new posts stack down the left
+   edge. Each card now goes into the currently SHORTEST column, so the grid
+   grows across the row like a proper booru. */
+let mcols = [], colH = [];
+function colCount() {
+  const w = gallery.clientWidth || innerWidth;
+  // FIX: on phones S/M/L maps straight to column count (previously all 3
+  // collapsed to the same 2-column layout, so the setting did nothing)
+  if (w <= 640) return { s: 3, m: 2, l: 1 }[S.settings.card] || 2;
+  const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cardw')) || 230;
+  return Math.max(2, Math.min(8, Math.floor((w + 12) / (cw + 12))));
+}
+function setupCols() {
+  const n = colCount();
+  if (n === mcols.length) return;
+  const cards = mcols.flatMap(c => [...c.children]);
+  gallery.innerHTML = '';
+  colH = new Array(n).fill(0);
+  mcols = Array.from({ length: n }, () => {
+    const c = document.createElement('div');
+    c.className = 'gcol';
+    gallery.appendChild(c);
+    return c;
+  });
+  cards.forEach(placeCard);
+}
+function placeCard(el) {
+  if (!mcols.length) setupCols();
+  let mi = 0;
+  for (let i = 1; i < colH.length; i++) if (colH[i] < colH[mi]) mi = i;
+  mcols[mi].appendChild(el);
+  // thumbs have a fixed aspect-ratio, so height is predictable before load
+  const cw = mcols[mi].clientWidth || 200;
+  colH[mi] += cw / Math.max(.6, Math.min(2.2, parseFloat(el.dataset.ar) || .8)) + 12;
+}
+function clearGallery() {
+  gallery.innerHTML = '';
+  mcols = []; colH = [];
+  setupCols();
+}
+let rszT;
+addEventListener('resize', () => { clearTimeout(rszT); rszT = setTimeout(setupCols, 150); });
 function cardEl(p) {
   const el = document.createElement('div');
   el.className = 'card';
@@ -966,6 +1079,7 @@ function cardEl(p) {
   const w     = p.width  || 4;
   const h     = p.height || 3;
   const ar    = Math.min(2.2, Math.max(0.6, w / h));
+  el.dataset.ar = String(ar); // masonry height estimate
 
   el.innerHTML = `
     <div class="thumb" style="aspect-ratio:${ar}">
@@ -1010,11 +1124,21 @@ function attachPreview(el, p, file) {
     const box = el.querySelector('.thumb');
     const v = document.createElement('video');
     v.src = file;
-    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+    v.muted = true; v.playsInline = true; v.preload = 'auto';
     v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1';
     box.appendChild(v);
     previewVid = v;
     dbg.vids++;
+    // FIX: sample the video instead of playing it through -
+    // start 3s in, play 3s, skip 3s forward, repeat; wraps at the end
+    let seg = 3;
+    v.addEventListener('loadedmetadata', () => { try { v.currentTime = seg; } catch (e) {} });
+    v.addEventListener('timeupdate', () => {
+      if (!v.duration || v.currentTime < seg + 3) return;
+      seg += 6; // 3s played + 3s skipped
+      if (seg >= v.duration - 1) seg = 3;
+      try { v.currentTime = seg; } catch (e) {}
+    });
     v.play().catch(() => {});
   });
   el.addEventListener('mouseleave', killPreview);
@@ -1043,7 +1167,7 @@ function renderTags() {
 function resetHome() {
   S.tags = []; S.posts = []; S.page = 0; S.hasMore = false;
   renderTags(); writeHash();
-  gallery.innerHTML = '';
+  clearGallery();
   toolbar.hidden = true;
   feedfoot.hidden = true;
   emptyEl.hidden = false;
@@ -1140,13 +1264,13 @@ function saveHist() {
 /* ══ FILTERS ══════════════════════════════════════════════════════════ */
 function syncUI() {
   const st = S.settings;
-  $('segRating').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === st.rating));
   $('segType').querySelectorAll('button').forEach(b =>   b.classList.toggle('on', b.dataset.v === st.type));
   $('scoreRange').value = st.minScore; $('scoreVal').textContent = st.minScore;
   $('aiTog').classList.toggle('on',   st.ai);
   $('prevTog').classList.toggle('on', st.previews);
   $('segSize').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === st.card));
   document.documentElement.style.setProperty('--cardw', { s: '170px', m: '230px', l: '300px' }[st.card]);
+  setupCols(); // card size changed -> recompute column count
   $('sortSel').value = S.sort;
 }
 const saveSt = () => LS.set('settings', S.settings);
@@ -1156,7 +1280,6 @@ $('filterBtn').onclick = () => { $('fbar').hidden = !$('fbar').hidden; $('filter
 function segBind(id, fn) {
   $(id).querySelectorAll('button').forEach(b => b.onclick = () => { fn(b.dataset.v); syncUI(); if (S.tags.length) doSearch(); });
 }
-segBind('segRating', v => S.settings.rating = v);
 segBind('segType',   v => S.settings.type   = v);
 segBind('segSize',   v => { S.settings.card = v; saveSt(); });
 
@@ -1271,9 +1394,14 @@ function renderLB() {
     lbStage.appendChild(wrap);
 
     S.lb.plyr = new Plyr(v, {
-      controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
-      settings: ['speed', 'loop'],
-      invertTime: false,
+      // FIX: iOS ignores JS volume - on touch UIs drop mute/volume so the
+      // progress bar gets full width instead of a huge volume slider
+      controls: matchMedia('(hover: none), (max-width: 640px)').matches
+        ? ['play-large', 'play', 'progress', 'current-time', 'settings', 'fullscreen']
+        : ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+      settings: ['speed', 'loop', 'quality'],
+      seekTime: 5, // FIX: arrow keys seek 5s instead of 10s
+      invertTime: true,
       autoplay:   true,
       tooltips:   { controls: true, seek: true },
     });
@@ -1333,19 +1461,29 @@ function renderLB() {
   img.src = displayUrl;
 
   // Panzoom
-  $('zoomctl').hidden = false;
-  const pz = S.lb.pz = Panzoom(img, { maxScale: 8, minScale: .2, step: .25, canvas: true });
-  const wl = e => { e.preventDefault(); pz.zoomWithWheel(e); };
-  lbStage.addEventListener('wheel', wl, { passive: false });
-  S.lb.wheelFn = wl;
+  try {
+    if (typeof Panzoom === 'function') {
+      $('zoomctl').hidden = false;
+      const pz = S.lb.pz = Panzoom(img, { maxScale: 8, minScale: .2, step: .25, canvas: true });
+      const wl = e => { e.preventDefault(); pz.zoomWithWheel(e); };
+      lbStage.addEventListener('wheel', wl, { passive: false });
+      S.lb.wheelFn = wl;
 
-  pz.on('panzoomzoom', () => {
-    $('zLvl').textContent = Math.round(pz.getScale() * 100) + '%';
-    img.classList.toggle('zoomed', pz.getScale() > 1.01);
-  });
-  img.addEventListener('dblclick', () => {
-    pz.getScale() > 1.01 ? pz.reset() : pz.zoom(2.5, { animate: true });
-  });
+      // FIX: Panzoom v4 dispatches CustomEvents on the element itself —
+      // the instance has NO .on() method (that was crashing renderLB and
+      // preventing the lightbox from ever opening).
+      img.addEventListener('panzoomzoom', () => {
+        $('zLvl').textContent = Math.round(pz.getScale() * 100) + '%';
+        img.classList.toggle('zoomed', pz.getScale() > 1.01);
+      });
+      img.addEventListener('dblclick', () => {
+        pz.getScale() > 1.01 ? pz.reset() : pz.zoom(2.5, { animate: true });
+      });
+    }
+  } catch (err) {
+    // Never let a zoom-library failure block the viewer from opening
+    console.warn('Panzoom init failed — opening viewer without zoom:', err);
+  }
 }
 
 /* lightbox controls */
@@ -1436,6 +1574,19 @@ document.addEventListener('keydown', e => {
 });
 
 /* ══ INIT ════════════════════════════════════════════════════════════ */
+/* ══ AGE GATE ════════════════════════════════════════════════════════ */
+if (!LS.get('ageok', false)) {
+  $('ageGate').hidden = false;
+  document.body.classList.add('gate-open');
+  $('ageYes').onclick = () => {
+    LS.set('ageok', true);
+    $('ageGate').hidden = true;
+    document.body.classList.remove('gate-open');
+  };
+  // under 18 -> rickroll; location.replace so Back doesn't return straight here
+  $('ageNo').onclick = () => location.replace('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+}
+
 readHash();
 syncUI();
 renderTags();
