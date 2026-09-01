@@ -120,7 +120,8 @@ a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transpar
 /* dropdown */
 .drop {
   position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-  background: var(--glass); backdrop-filter: blur(24px) saturate(170%);
+  background: rgba(16,21,29,.92); backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid var(--glass-brd);
   border-radius: var(--r); box-shadow: var(--shadow);
   overflow: hidden auto; max-height: 300px; z-index: 300; display: none;
@@ -418,6 +419,19 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
 .lb-tag:hover { color: var(--accent); border-color: var(--accent); }
 .lb-actions { display: flex; gap: 3px; flex-shrink: 0; }
 .lb-actions .ibtn { width: 36px; height: 36px; }
+.reel{position:fixed;inset:0;z-index:550;background:#000;}
+.reel-vp{height:100%;overflow-y:auto;scrollbar-width:none;scroll-snap-type:y mandatory;overscroll-behavior:contain;}
+.reel-vp::-webkit-scrollbar{display:none;}
+.reel-slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;display:flex;align-items:center;justify-content:center;background:#000;}
+.reel-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.reel-media{max-width:100%;max-height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none;}
+.reel-err{display:flex;flex-direction:column;gap:10px;align-items:center;color:var(--dim);}
+.reel-meta{position:absolute;left:14px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#fff;font-size:12.5px;font-weight:700;font-family:var(--mono);text-shadow:0 1px 4px rgba(0,0,0,.85);pointer-events:none;max-width:calc(100% - 28px);}
+.reel-meta .rm-sc{color:#ffcc88;display:inline-flex;gap:4px;align-items:center;}
+.reel-meta .rm-rs{color:#cbd5e1;}
+.reel-tag{padding:3px 9px;border-radius:99px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.14);font-size:11px;}
+.reel-count{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;z-index:20;color:#fff;font-family:var(--mono);font-weight:800;font-size:13px;text-shadow:0 1px 4px rgba(0,0,0,.85);}
+.reel-mute{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));right:16px;top:auto;z-index:20;width:42px;height:42px;border-radius:14px;background:var(--glass);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-brd);color:#fff;display:flex;align-items:center;justify-content:center;}
 
 /* ── SETTINGS MODAL ─────────────────────────── */
 .overlay {
@@ -635,11 +649,20 @@ input[type=range] { accent-color: var(--accent); width: 110px; cursor: pointer; 
     <span class="lb-count" id="lbCount"></span>
     <div class="lb-tags" id="lbTags"></div>
     <div class="lb-actions">
+      <button class="ibtn" id="lbReel" title="Scroller mode"></button>
       <button class="ibtn" id="lbDl" title="Open file"></button>
       <button class="ibtn" id="lbCopy" title="Copy URL"></button>
       <button class="ibtn" id="lbPost" title="View on rule34"></button>
     </div>
   </div>
+</div>
+
+<!-- REEL (TikTok-style vertical scroller) -->
+<div class="reel" id="reel" hidden>
+  <div class="reel-vp" id="reelVp"></div>
+  <button class="lb-close" id="reelClose" title="Close (Esc)"></button>
+  <button class="reel-mute" id="reelMute" title="Sound"></button>
+  <span class="reel-count" id="reelCount">0 / 0</span>
 </div>
 
 <!-- SETTINGS MODAL -->
@@ -713,6 +736,9 @@ const IC = {
   play:   '<polygon points="5 3 19 12 5 21 5 3"/>',
   image:  '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
   clock:  '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 12"/>',
+  sound:  '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>',
+  mute:   '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>',
+  reel:   '<rect x="2" y="4" width="14" height="16" rx="2"/><path d="M19 2l4 2.5v15L19 22z"/>',
   warn:   '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
 };
 const icon = (n, s = 18) =>
@@ -732,6 +758,9 @@ ico('lbNext',        'chevr');
 ico('lbDl',          'dl');
 ico('lbCopy',        'copy');
 ico('lbPost',        'ext');
+ico('lbReel',        'reel');
+ico('reelClose',     'x', 18);
+ico('reelMute',      'sound');
 ico('zIn',           'plus');
 ico('zOut',          'minus');
 ico('zRst',          'reset');
@@ -1549,8 +1578,132 @@ $('blAdd').onclick               = addBL;
 $('blInput').addEventListener('keydown', e => { if (e.key === 'Enter') addBL(); });
 
 /* ══ KEYBOARD ════════════════════════════════════════════════════════ */
+/* REEL - TikTok-style vertical scroller */
+const reelEl = $('reel');
+const reelVp = $('reelVp');
+const R = { i: -1, io: null, muted: true };
+
+function makeReelSlide(p) {
+  const s = document.createElement('div');
+  s.className = 'reel-slide';
+  const w = document.createElement('div');
+  w.className = 'reel-wrap';
+  const file = resolveFile(p);
+  const thumb = resolveThumb(p);
+  const url = file || thumb;
+  if (!url) {
+    s.innerHTML = "<div class='reel-err'>" + icon('warn', 36) + '<strong>No media</strong></div>';
+    return s;
+  }
+  if (isVid(file)) {
+    const v = document.createElement('video');
+    v.className = 'reel-media';
+    v.src = file;
+    v.muted = R.muted;
+    v.loop = true;
+    v.playsInline = true;
+    v.preload = 'metadata';
+    v.addEventListener('click', e => { e.stopPropagation(); v.paused ? v.play().catch(() => {}) : v.pause(); });
+    w.appendChild(v);
+  } else {
+    const img = document.createElement('img');
+    img.className = 'reel-media';
+    img.alt = '';
+    img.referrerPolicy = 'strict-origin-when-cross-origin';
+    img.src = url;
+    w.appendChild(img);
+  }
+  s.appendChild(w);
+  const meta = document.createElement('div');
+  meta.className = 'reel-meta';
+  let mh = '<span class="rm-sc">' + icon('star', 11) + (p.score ?? 0) + '</span>';
+  if (p.width) mh += '<span class="rm-rs">' + p.width + '\u00d7' + p.height + '</span>';
+  (p.tags || '').split(' ').filter(Boolean).slice(0, 6).forEach(t => { mh += '<span class="reel-tag">' + esc(t) + '</span>'; });
+  meta.innerHTML = mh;
+  s.appendChild(meta);
+  return s;
+}
+
+function ensureReel() {
+  const a = Math.max(0, R.i - 1);
+  const b = Math.min(S.posts.length - 1, R.i + 1);
+  for (let k = a; k <= b; k++) {
+    if (!reelVp.querySelector('.reel-slide[data-i="' + k + '"]')) {
+      const sd = makeReelSlide(S.posts[k]);
+      sd.dataset.i = String(k);
+      const nxt = [...reelVp.children].find(el => +el.dataset.i > k);
+      if (nxt) reelVp.insertBefore(sd, nxt); else reelVp.appendChild(sd);
+      if (R.io) R.io.observe(sd);
+    }
+  }
+}
+
+
+function setActive(idx) {
+  const prev = R.i;
+  R.i = idx;
+  $('reelCount').textContent = (idx + 1) + ' / ' + S.posts.length;
+  reelVp.querySelectorAll('video').forEach(v => { if (!v.paused) v.pause(); });
+  const cur = reelVp.querySelector('.reel-slide[data-i="' + idx + '"] video');
+  if (cur) { cur.muted = R.muted; try { cur.currentTime = 0; } catch (e) {} cur.play().catch(() => {}); }
+  if (prev !== idx) {
+    ensureReel();
+    [...reelVp.children].forEach(sd => {
+      const k = +sd.dataset.i;
+      if (k < idx - 2 || k > idx + 2) { if (R.io) R.io.unobserve(sd); sd.remove(); }
+    });
+  }
+  if (idx >= S.posts.length - 2 && S.hasMore) loadMore();
+}
+
+function openReel(i) {
+  if (i < 0 || i >= S.posts.length) return;
+  if (S.lb.plyr) { try { S.lb.plyr.pause(); } catch (e) {} }
+  reelEl.hidden = false;
+  document.body.classList.add('lb-open');
+  if (!R.io) {
+    R.io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting && en.intersectionRatio >= 0.5) {
+          const idx = +en.target.dataset.i;
+          if (idx !== R.i) setActive(idx);
+        }
+      });
+    }, { root: reelVp, threshold: 0.6 });
+  }
+  R.i = i;
+  ensureReel();
+  const cur = reelVp.querySelector('.reel-slide[data-i="' + i + '"]');
+  if (cur) reelVp.scrollTop = cur.offsetTop;
+  $('reelCount').textContent = (i + 1) + ' / ' + S.posts.length;
+  setActive(i);
+}
+
+function closeReel() {
+  if (R.io) { R.io.disconnect(); R.io = null; }
+  reelVp.innerHTML = '';
+  R.i = -1;
+  reelEl.hidden = true;
+  if (lbEl.hidden) document.body.classList.remove('lb-open');
+}
+
+function setMute(m) {
+  R.muted = m;
+  reelVp.querySelectorAll('video').forEach(v => v.muted = m);
+  $('reelMute').innerHTML = icon(m ? 'mute' : 'sound', 18);
+}
+$('reelMute').onclick = () => setMute(!R.muted);
+setMute(R.muted);
+$('reelClose').onclick = closeReel;
+$('lbReel').onclick = () => openReel(S.lb.i);
+
 document.addEventListener('keydown', e => {
   const typing = e.target.matches('input,select,textarea');
+  if (!reelEl.hidden) {
+    if (e.key === 'Escape')    { closeReel(); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); reelVp.scrollBy({ top: -reelVp.clientHeight, behavior: 'smooth' }); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); reelVp.scrollBy({ top: reelVp.clientHeight, behavior: 'smooth' }); return; }
+  }
   if (e.key === '`') { e.preventDefault(); $('dbgBtn').click(); return; }
   if (e.key === '/' && !typing && lbEl.hidden) { e.preventDefault(); qEl.focus(); return; }
   if (lbEl.hidden || typing) return;
