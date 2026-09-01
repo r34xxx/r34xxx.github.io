@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>r34</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@latest/300.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@latest/400.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@latest/600.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@latest/300-italic.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@latest/400-italic.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@latest/300.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@latest/400.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@latest/500.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/artplayer@5.1.7/dist/artplayer.js"></script>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,18 +20,28 @@
   --bg: #0a0a0a;
   --surface: #141414;
   --surface-2: #1c1c1c;
+  --surface-3: #242424;
   --border: #2a2a2a;
+  --border-hover: #3a3a3a;
   --text: #e8e4df;
   --text-dim: #7a7570;
+  --text-faint: #55504b;
   --accent: #c8956c;
   --accent-glow: rgba(200, 149, 108, 0.15);
   --accent-hot: #e07a4a;
+  --danger: #e04a4a;
+  --success: #6cc895;
+  --warning: #c8b86c;
   --radius: 6px;
   --radius-lg: 12px;
+  --radius-xl: 16px;
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'DM Sans', 'Helvetica Neue', sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
 }
 
 html { scroll-behavior: smooth; }
@@ -47,6 +65,8 @@ body::before {
   z-index: 0;
 }
 
+button, input, select { font-family: inherit; }
+
 /* ── HEADER ── */
 .header {
   position: sticky;
@@ -64,8 +84,8 @@ body::before {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 2rem;
-  height: 72px;
+  gap: 1.5rem;
+  height: 64px;
 }
 
 .logo {
@@ -76,11 +96,52 @@ body::before {
   color: var(--text);
   white-space: nowrap;
   flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
 }
 
-.logo span {
-  color: var(--accent);
-  font-style: italic;
+.logo span { color: var(--accent); font-style: italic; }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.icon-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-hover); }
+.icon-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.icon-btn svg { width: 16px; height: 16px; }
+
+.network-indicator {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* ── SEARCH ── */
@@ -97,8 +158,8 @@ body::before {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 100px;
-  padding: 0 1rem 0 1.25rem;
-  height: 44px;
+  padding: 0 0.75rem 0 1.25rem;
+  height: 42px;
   transition: border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
 }
 
@@ -108,8 +169,8 @@ body::before {
 }
 
 .search-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--text-dim);
   flex-shrink: 0;
   transition: color 0.3s;
@@ -119,27 +180,26 @@ body::before {
 
 .search-input {
   flex: 1;
+  min-width: 0;
   background: none;
   border: none;
   outline: none;
   color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 400;
   padding: 0 0.75rem;
   letter-spacing: 0.01em;
 }
 
-.search-input::placeholder { color: var(--text-dim); }
+.search-input::placeholder { color: var(--text-faint); }
 
 .search-btn {
   background: var(--accent);
   color: var(--bg);
   border: none;
   border-radius: 100px;
-  padding: 0.45rem 1.25rem;
-  font-family: var(--font-body);
-  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -163,15 +223,39 @@ body::before {
   overflow: hidden;
   display: none;
   z-index: 200;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-  max-height: 260px;
+  box-shadow: var(--shadow-lg);
+  max-height: 320px;
   overflow-y: auto;
 }
 
 .autocomplete-list.active { display: block; }
 
+.autocomplete-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.autocomplete-header button {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 0.68rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.autocomplete-header button:hover { color: var(--danger); }
+
 .autocomplete-item {
-  padding: 0.65rem 1.25rem;
+  padding: 0.6rem 1rem;
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.15s;
@@ -193,7 +277,105 @@ body::before {
 
 .autocomplete-item .match { color: var(--accent); font-weight: 500; }
 
-/* ── ACTIVE TAGS ── */
+.autocomplete-item .history-remove {
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  transition: opacity 0.15s;
+}
+
+.autocomplete-item:hover .history-remove { opacity: 1; }
+.autocomplete-item .history-remove:hover { background: var(--danger); color: #fff; }
+
+/* ── FILTERS PANEL ── */
+.filters-panel {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s var(--ease-out), padding 0.4s var(--ease-out);
+}
+
+.filters-panel.open {
+  max-height: 200px;
+  padding: 1rem 2rem;
+}
+
+.filters-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.filter-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.filter-label {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.filter-buttons { display: flex; gap: 0.25rem; }
+
+.filter-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover { border-color: var(--border-hover); color: var(--text); }
+.filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+.filter-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-slider input[type="range"] {
+  width: 120px;
+  accent-color: var(--accent);
+}
+
+.filter-slider-value {
+  font-size: 0.75rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+}
+
+.ai-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ai-toggle input { accent-color: var(--accent); }
+
+/* ── TAGS BAR ── */
 .tags-bar {
   max-width: 1600px;
   margin: 0 auto;
@@ -214,7 +396,7 @@ body::before {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 100px;
-  padding: 0.3rem 0.75rem 0.3rem 0.85rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.85rem;
   font-size: 0.78rem;
   font-weight: 400;
   color: var(--text);
@@ -227,9 +409,28 @@ body::before {
   to { opacity: 1; transform: scale(1); }
 }
 
+.tag-pill.negated { background: rgba(224,74,74,0.15); border-color: var(--danger); color: var(--danger); }
+
 .tag-pill .remove {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  transition: background 0.15s, color 0.15s;
+  border: none;
+}
+
+.tag-pill .remove:hover { background: var(--danger); color: #fff; }
+
+.tag-pill .blacklist-btn {
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,19 +440,26 @@ body::before {
   font-size: 0.7rem;
   color: var(--text-dim);
   transition: background 0.15s, color 0.15s;
+  border: none;
+  margin-left: -0.15rem;
 }
 
-.tag-pill .remove:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+.tag-pill .blacklist-btn:hover { background: var(--warning); color: var(--bg); }
 
-.tag-pill .count-badge {
-  background: var(--accent);
-  color: var(--bg);
-  font-size: 0.65rem;
-  font-weight: 500;
-  padding: 0.1rem 0.4rem;
+.clear-all {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
   border-radius: 100px;
-  font-variant-numeric: tabular-nums;
+  transition: color 0.2s, background 0.2s;
 }
+
+.clear-all:hover { color: var(--danger); background: rgba(224,74,74,0.08); }
 
 /* ── TOOLBAR ── */
 .toolbar {
@@ -261,9 +469,18 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .toolbar.hidden { display: none; }
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
 
 .result-info {
   font-size: 0.8rem;
@@ -273,33 +490,44 @@ body::before {
 
 .result-info strong { color: var(--text); font-weight: 500; }
 
-.sort-wrap {
+.toolbar-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
-.sort-label {
-  font-size: 0.75rem;
-  color: var(--text-dim);
+.sort-wrap, .jump-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sort-label, .jump-label {
+  font-size: 0.7rem;
+  color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
-.sort-select {
+.sort-select, .jump-input {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.5rem;
   cursor: pointer;
   outline: none;
   transition: border-color 0.2s;
 }
 
-.sort-select:focus { border-color: var(--accent); }
+.sort-select:focus, .jump-input:focus { border-color: var(--accent); }
+
+.jump-input {
+  width: 50px;
+  text-align: center;
+  cursor: text;
+}
 
 /* ── GALLERY GRID ── */
 .gallery {
@@ -310,6 +538,7 @@ body::before {
   column-gap: 0.75rem;
 }
 
+@media (max-width: 1400px) { .gallery { columns: 4; } }
 @media (max-width: 1200px) { .gallery { columns: 3; } }
 @media (max-width: 860px) { .gallery { columns: 2; } }
 @media (max-width: 540px) { .gallery { columns: 1; max-width: 480px; } }
@@ -323,6 +552,8 @@ body::before {
   cursor: pointer;
   background: var(--surface);
   animation: itemIn 0.5s var(--ease-out) both;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }
 
 @keyframes itemIn {
@@ -330,26 +561,53 @@ body::before {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.gallery-item img, .gallery-item video {
+.gallery-item img {
   width: 100%;
   display: block;
   transition: transform 0.4s var(--ease-out);
+  background: var(--surface-2);
 }
 
-.gallery-item:hover img, .gallery-item:hover video {
-  transform: scale(1.03);
+.gallery-item:hover img { transform: scale(1.03); }
+
+.item-badges {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  z-index: 2;
 }
+
+.badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  user-select: none;
+}
+
+.badge.type-image { background: rgba(108,200,149,0.85); color: #0a0a0a; }
+.badge.type-video { background: rgba(224,122,74,0.85); color: #0a0a0a; }
+.badge.type-gif { background: rgba(200,184,108,0.85); color: #0a0a0a; }
+.badge.score { background: rgba(0,0,0,0.6); color: #fff; }
+.badge.ai { background: rgba(224,74,74,0.85); color: #fff; }
 
 .gallery-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 40%);
+  background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 0.3s;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1rem;
+  padding: 0.75rem;
+  pointer-events: none;
 }
 
 .gallery-item:hover .gallery-overlay { opacity: 1; }
@@ -357,265 +615,38 @@ body::before {
 .overlay-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-bottom: 0.5rem;
+  gap: 0.25rem;
+  margin-bottom: 0.4rem;
+  max-height: 3rem;
+  overflow: hidden;
 }
 
 .overlay-tag {
-  font-size: 0.65rem;
-  background: rgba(255,255,255,0.12);
+  font-size: 0.62rem;
+  background: rgba(255,255,255,0.15);
   backdrop-filter: blur(6px);
-  padding: 0.15rem 0.5rem;
+  padding: 0.1rem 0.4rem;
   border-radius: 100px;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.9);
   letter-spacing: 0.02em;
 }
 
 .overlay-stats {
   display: flex;
   gap: 0.75rem;
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.8);
   font-variant-numeric: tabular-nums;
 }
 
-.overlay-stats span { display: flex; align-items: center; gap: 0.25rem; }
+.overlay-stats span { display: flex; align-items: center; gap: 0.2rem; }
 
-.video-badge {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
-  border-radius: 100px;
-  padding: 0.25rem 0.6rem;
-  font-size: 0.65rem;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.gallery-item:hover .video-badge { opacity: 1; }
-
-/* ── PAGINATION ── */
-.pagination {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 0 2rem 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.page-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.page-btn:hover { border-color: var(--accent); background: var(--surface-2); }
-.page-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 500; }
-.page-btn:disabled { opacity: 0.3; cursor: default; }
-
-.page-ellipsis {
-  color: var(--text-dim);
-  padding: 0 0.25rem;
-  font-size: 0.85rem;
-}
-
-/* ── LIGHTBOX ── */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(0,0,0,0.92);
-  backdrop-filter: blur(30px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  animation: lbIn 0.3s var(--ease-out);
-}
-
-.lightbox.active { display: flex; }
-
-@keyframes lbIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.lightbox-content {
-  max-width: 90vw;
-  max-height: 85vh;
-  position: relative;
-  animation: lbContent 0.4s var(--ease-out);
-  cursor: zoom-in;
-  transition: transform 0.2s var(--ease-out);
-  transform-origin: center center;
-}
-
-.lightbox-content.zoomed {
-  cursor: grab;
-  max-width: none;
-  max-height: none;
-}
-
-.lightbox-content.zoomed:active {
-  cursor: grabbing;
-}
-
-.lightbox-content img, .lightbox-content video {
-  max-width: 90vw;
-  max-height: 85vh;
-  border-radius: var(--radius-lg);
-  object-fit: contain;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.lightbox-content.zoomed img, .lightbox-content.zoomed video {
-  max-width: none;
-  max-height: none;
-  border-radius: 0;
-}
-
-@keyframes lbContent {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.lightbox-content img, .lightbox-content video {
-  max-width: 90vw;
-  max-height: 85vh;
-  border-radius: var(--radius-lg);
-  object-fit: contain;
-}
-
-.lightbox-close {
-  position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  z-index: 1001;
-}
-
-.lightbox-close:hover { background: rgba(255,255,255,0.15); }
-
-.lightbox-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  z-index: 1001;
-}
-
-.lightbox-nav:hover { background: rgba(255,255,255,0.12); }
-.lightbox-prev { left: 1.5rem; }
-.lightbox-next { right: 1.5rem; }
-
-.lightbox-info {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 100px;
-  padding: 0.5rem 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.7);
-  z-index: 1001;
-}
-
-.lightbox-info .lb-counter { color: #fff; font-weight: 500; font-variant-numeric: tabular-nums; }
-
-.lb-zoom-controls {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 100px;
-  padding: 0.35rem 0.5rem;
-  z-index: 1001;
-}
-
-.lb-zoom-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  font-family: var(--font-body);
-}
-
-.lb-zoom-btn:hover { background: rgba(255,255,255,0.12); }
-
-.lb-zoom-level {
-  color: rgba(255,255,255,0.7);
-  font-size: 0.72rem;
-  min-width: 36px;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  user-select: none;
-}
-
-/* ── STATES ── */
-.empty-state {
-  grid-column: 1 / -1;
+/* ── LOADING / EMPTY ── */
+.loading-state, .empty-state {
   text-align: center;
   padding: 6rem 2rem;
-  columns: unset;
+  break-inside: avoid;
+  column-span: all;
 }
 
 .empty-state .empty-icon {
@@ -638,17 +669,6 @@ body::before {
   margin: 0 auto;
 }
 
-.loading-state {
-  columns: unset;
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6rem 2rem;
-  gap: 1rem;
-}
-
 .spinner {
   width: 36px;
   height: 36px;
@@ -656,29 +676,549 @@ body::before {
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.loading-state p {
-  color: var(--text-dim);
-  font-size: 0.85rem;
+.skeleton-grid {
+  columns: 4;
+  column-gap: 0.75rem;
 }
 
+@media (max-width: 1200px) { .skeleton-grid { columns: 3; } }
+@media (max-width: 860px) { .skeleton-grid { columns: 2; } }
+@media (max-width: 540px) { .skeleton-grid { columns: 1; } }
+
+.skeleton-item {
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── SENTINEL / PAGINATION ── */
+.sentinel {
+  height: 1px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.load-more-wrap {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.load-more-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.6rem 1.5rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.load-more-btn:hover { border-color: var(--accent); background: var(--surface-2); }
+
+.page-info {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+/* ── LIGHTBOX ── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(30px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: lbIn 0.3s var(--ease-out);
+}
+
+.lightbox.active { display: flex; }
+
+@keyframes lbIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-content {
+  max-width: 90vw;
+  max-height: 85vh;
+  position: relative;
+  animation: lbContent 0.4s var(--ease-out);
+  will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-content.zoomed {
+  cursor: grab;
+  max-width: none;
+  max-height: none;
+}
+
+.lightbox-content.zoomed:active { cursor: grabbing; }
+
+.lightbox-content img {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: var(--radius-lg);
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lightbox-content.zoomed img {
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+}
+
+.lightbox-content .artplayer {
+  width: 90vw;
+  max-width: 1200px;
+  height: 85vh;
+  max-height: 800px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+@keyframes lbContent {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.lightbox-close, .lightbox-nav {
+  position: fixed;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, opacity 0.2s;
+  z-index: 1001;
+}
+
+.lightbox-close:hover, .lightbox-nav:hover { background: rgba(255,255,255,0.15); }
+.lightbox-nav:disabled { opacity: 0.2; cursor: default; }
+
+.lightbox-close { top: 1.5rem; right: 1.5rem; }
+.lightbox-nav { top: 50%; transform: translateY(-50%); }
+.lightbox-prev { left: 1.5rem; }
+.lightbox-next { right: 1.5rem; }
+
+.lightbox-info {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 0.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.7);
+  z-index: 1001;
+  max-width: 90vw;
+}
+
+.lb-counter { color: #fff; font-weight: 500; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+.lightbox-actions {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.lb-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.lb-action-btn:hover { background: rgba(255,255,255,0.15); }
+.lb-action-btn.active { background: var(--accent); color: var(--bg); }
+.lb-action-btn svg { width: 16px; height: 16px; }
+
+.lb-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(0,0,0,0.5);
+  border-radius: 100px;
+  padding: 0.2rem;
+}
+
+.lb-zoom-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.lb-zoom-btn:hover { background: rgba(255,255,255,0.12); }
+
+.lb-zoom-level {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.7rem;
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+/* ── MODALS ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: lbIn 0.2s var(--ease-out);
+}
+
+.modal-backdrop.active { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: lbContent 0.3s var(--ease-out);
+}
+
+.modal h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.modal-close:hover { background: var(--surface-2); color: var(--text); }
+
+.modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.modal-section:last-child { margin-bottom: 0; }
+
+.modal-section h3 {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.blacklist-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.blacklist-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(224,74,74,0.15);
+  border: 1px solid rgba(224,74,74,0.3);
+  color: var(--danger);
+  padding: 0.25rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+}
+
+.blacklist-tag button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.blacklist-empty {
+  color: var(--text-faint);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.shortcut-item:last-child { border-bottom: none; }
+
+.shortcut-keys {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.key {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-family: 'SF Mono', Monaco, monospace;
+  color: var(--text);
+}
+
+.shortcut-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* ── DEBUG OVERLAY ── */
+.debug-overlay {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  z-index: 3000;
+  display: none;
+  min-width: 200px;
+  box-shadow: var(--shadow-lg);
+}
+
+.debug-overlay.active { display: block; }
+
+.debug-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.15rem 0;
+}
+
+.debug-label { color: var(--text-faint); }
+.debug-value { color: var(--accent); font-variant-numeric: tabular-nums; }
+.debug-value.error { color: var(--danger); }
+.debug-value.success { color: var(--success); }
+
+/* ── TOAST ── */
+.toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 250px;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s var(--ease-spring);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.toast.removing { animation: toastOut 0.3s var(--ease-out) forwards; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.toast.info .toast-icon { background: var(--accent); color: var(--bg); }
+.toast.success .toast-icon { background: var(--success); color: var(--bg); }
+.toast.error .toast-icon { background: var(--danger); color: #fff; }
+.toast.warning .toast-icon { background: var(--warning); color: var(--bg); }
+
+.toast-content { flex: 1; min-width: 0; }
+.toast-title { font-size: 0.8rem; font-weight: 500; color: var(--text); }
+.toast-message { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.1rem; }
+
+/* ── SCROLL TOP ── */
+.scroll-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 50;
+  font-size: 1.2rem;
+}
+
+.scroll-top.visible { opacity: 1; pointer-events: auto; }
+.scroll-top:hover { transform: scale(1.1); }
+
 /* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+/* ── ARTPLAYER THEME ── */
+.artplayer {
+  --art-theme: var(--accent);
+  --art-progress-color: var(--accent);
+  --art-volume-color: var(--accent);
+  background: #000 !important;
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .header-inner { gap: 1rem; }
+  .header { padding: 0 1rem; }
+  .header-inner { gap: 0.75rem; }
   .logo { font-size: 1.2rem; }
-  .gallery { padding: 1rem 1rem 3rem; column-gap: 0.5rem; }
+  .header-actions { gap: 0.25rem; }
+  .icon-btn { width: 32px; height: 32px; }
+  .gallery { padding: 1rem 0.75rem 3rem; column-gap: 0.5rem; }
   .gallery-item { margin-bottom: 0.5rem; border-radius: var(--radius); }
-  .tags-bar, .toolbar { padding-left: 1rem; padding-right: 1rem; }
-  .pagination { padding: 0 1rem 3rem; }
+  .tags-bar, .toolbar, .filters-panel { padding-left: 1rem; padding-right: 1rem; }
+  .lightbox-prev { left: 0.5rem; }
+  .lightbox-next { right: 0.5rem; }
+  .lightbox-nav { width: 36px; height: 36px; }
+  .lightbox-close { top: 1rem; right: 1rem; }
+  .lightbox-info { top: 1rem; font-size: 0.7rem; padding: 0.4rem 0.8rem; }
+  .lightbox-actions { bottom: 1rem; }
+  .scroll-top { bottom: 1rem; right: 1rem; }
+  .debug-overlay { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .search-btn { padding: 0.4rem 0.75rem; font-size: 0.7rem; }
+  .lightbox-info { max-width: 85vw; }
+  .toolbar { flex-direction: column; align-items: flex-start; }
+  .toolbar-right { width: 100%; justify-content: flex-start; }
 }
 </style>
 </head>
@@ -686,74 +1226,218 @@ body::before {
 
 <header class="header">
   <div class="header-inner">
-    <div class="logo">r<span>34</span></div>
+    <div class="logo" id="logo" title="Reset search">r<span>34</span></div>
     <div class="search-wrap">
       <div class="search-bar">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" id="searchInput" type="text" placeholder="Search tags..." autocomplete="off" spellcheck="false">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search tags... (press / to focus)" autocomplete="off" spellcheck="false">
         <button class="search-btn" id="searchBtn">Search</button>
       </div>
       <div class="autocomplete-list" id="autocomplete"></div>
     </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="filtersBtn" title="Toggle filters (F)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </button>
+      <button class="icon-btn" id="blacklistBtn" title="Blacklist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      </button>
+      <button class="icon-btn" id="shortcutsBtn" title="Keyboard shortcuts (?)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>
+      </button>
+      <button class="icon-btn" id="debugBtn" title="Debug overlay (`)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 4h6a2 2 0 0 1 2 2v2a6 6 0 0 1 6 6v0a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v0a6 6 0 0 1 6-6V6a2 2 0 0 1 2-2z"/><path d="M10 4l-2-2M14 4l2-2"/></svg>
+        <span class="network-indicator" id="networkIndicator" style="display:none"></span>
+      </button>
+    </div>
   </div>
 </header>
+
+<div class="filters-panel" id="filtersPanel">
+  <div class="filters-inner">
+    <div class="filter-group">
+      <div class="filter-label">Rating</div>
+      <div class="filter-buttons" data-filter="rating">
+        <button class="filter-btn active" data-value="all">All</button>
+        <button class="filter-btn" data-value="safe">Safe</button>
+        <button class="filter-btn" data-value="questionable">Questionable</button>
+        <button class="filter-btn" data-value="explicit">Explicit</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Type</div>
+      <div class="filter-buttons" data-filter="type">
+        <button class="filter-btn active" data-value="all">All</button>
+        <button class="filter-btn" data-value="image">Image</button>
+        <button class="filter-btn" data-value="video">Video</button>
+        <button class="filter-btn" data-value="gif">GIF</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Min Score</div>
+      <div class="filter-slider">
+        <input type="range" id="scoreSlider" min="0" max="100" value="0">
+        <span class="filter-slider-value" id="scoreValue">0</span>
+      </div>
+    </div>
+    <div class="filter-group">
+      <label class="ai-toggle">
+        <input type="checkbox" id="aiFilter" checked>
+        Hide AI-generated
+      </label>
+    </div>
+  </div>
+</div>
 
 <div class="tags-bar" id="tagsBar"></div>
 
 <div class="toolbar hidden" id="toolbar">
-  <div class="result-info" id="resultInfo"></div>
-  <div class="sort-wrap">
-    <span class="sort-label">Sort</span>
-    <select class="sort-select" id="sortSelect">
-      <option value="score">Score</option>
-      <option value="id">ID (Newest)</option>
-      <option value="random">Random</option>
-    </select>
+  <div class="toolbar-left">
+    <div class="result-info" id="resultInfo"></div>
+  </div>
+  <div class="toolbar-right">
+    <div class="sort-wrap">
+      <span class="sort-label">Sort</span>
+      <select class="sort-select" id="sortSelect">
+        <option value="score">Score</option>
+        <option value="id">Newest</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
+    <div class="jump-wrap">
+      <span class="jump-label">Page</span>
+      <input type="number" class="jump-input" id="jumpInput" min="1" value="1">
+    </div>
   </div>
 </div>
 
-<div class="gallery" id="gallery">
-  <div class="empty-state">
-    <div class="empty-icon">◈</div>
-    <h2>Search for tags</h2>
-    <p>Type tags above to discover images and videos from the gallery.</p>
-  </div>
+<div class="gallery" id="gallery"></div>
+<div class="sentinel" id="sentinel"></div>
+<div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+  <button class="load-more-btn" id="loadMoreBtn">Load more</button>
 </div>
-
-<div class="pagination" id="pagination"></div>
+<div class="page-info" id="pageInfo"></div>
 
 <div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lbClose">&times;</button>
-  <button class="lightbox-nav lightbox-prev" id="lbPrev">&#8249;</button>
-  <button class="lightbox-nav lightbox-next" id="lbNext">&#8250;</button>
+  <button class="lightbox-close" id="lbClose" title="Close (Esc)">✕</button>
+  <button class="lightbox-nav lightbox-prev" id="lbPrev" title="Previous (←)">‹</button>
+  <button class="lightbox-nav lightbox-next" id="lbNext" title="Next (→)">›</button>
   <div class="lightbox-content" id="lbContent"></div>
   <div class="lightbox-info">
     <span class="lb-counter" id="lbCounter"></span>
     <span id="lbTags"></span>
   </div>
-  <div class="lb-zoom-controls">
-    <button class="lb-zoom-btn" id="lbZoomOut" title="Zoom Out">−</button>
-    <span class="lb-zoom-level" id="lbZoomLevel">100%</span>
-    <button class="lb-zoom-btn" id="lbZoomIn" title="Zoom In">+</button>
-    <button class="lb-zoom-btn" id="lbZoomReset" title="Reset Zoom">↺</button>
+  <div class="lightbox-actions">
+    <button class="lb-action-btn" id="lbDownload" title="Download (D)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+    <button class="lb-action-btn" id="lbCopy" title="Copy URL (C)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    </button>
+    <button class="lb-action-btn" id="lbOpen" title="Open original (O)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </button>
+    <div class="lb-zoom-controls" id="lbZoomControls">
+      <button class="lb-zoom-btn" id="lbZoomOut" title="Zoom out (-)">−</button>
+      <span class="lb-zoom-level" id="lbZoomLevel">100%</span>
+      <button class="lb-zoom-btn" id="lbZoomIn" title="Zoom in (+)">+</button>
+      <button class="lb-zoom-btn" id="lbZoomReset" title="Reset (0)">↺</button>
+    </div>
   </div>
 </div>
 
+<div class="modal-backdrop" id="blacklistModal">
+  <div class="modal">
+    <h2>Blacklist <button class="modal-close" data-close>✕</button></h2>
+    <div class="modal-section">
+      <h3>Hidden tags</h3>
+      <div class="blacklist-tags" id="blacklistTags"></div>
+    </div>
+    <div class="modal-section">
+      <h3>Add tag</h3>
+      <div class="search-bar" style="max-width:300px">
+        <input class="search-input" id="blacklistInput" type="text" placeholder="Add tag to blacklist..." autocomplete="off">
+        <button class="search-btn" id="blacklistAdd">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="shortcutsModal">
+  <div class="modal">
+    <h2>Keyboard Shortcuts <button class="modal-close" data-close>✕</button></h2>
+    <div class="modal-section">
+      <div class="shortcut-list">
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">/</span></span><span class="shortcut-desc">Focus search</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">Esc</span></span><span class="shortcut-desc">Close / blur</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">F</span></span><span class="shortcut-desc">Toggle filters</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">?</span></span><span class="shortcut-desc">Show shortcuts</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">`</span></span><span class="shortcut-desc">Toggle debug</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">←</span><span class="key">→</span></span><span class="shortcut-desc">Prev / next post</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">Space</span></span><span class="shortcut-desc">Play / pause video</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">M</span></span><span class="shortcut-desc">Mute / unmute</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">↑</span><span class="key">↓</span></span><span class="shortcut-desc">Volume</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">F</span></span><span class="shortcut-desc">Fullscreen (in video)</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">+</span><span class="key">-</span><span class="key">0</span></span><span class="shortcut-desc">Zoom in/out/reset</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">D</span></span><span class="shortcut-desc">Download</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">C</span></span><span class="shortcut-desc">Copy URL</span></div>
+        <div class="shortcut-item"><span class="shortcut-keys"><span class="key">O</span></span><span class="shortcut-desc">Open original</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="debug-overlay" id="debugOverlay">
+  <div class="debug-row"><span class="debug-label">Active requests</span><span class="debug-value" id="dbgActive">0</span></div>
+  <div class="debug-row"><span class="debug-label">Total requests</span><span class="debug-value" id="dbgTotal">0</span></div>
+  <div class="debug-row"><span class="debug-label">Cache hits</span><span class="debug-value success" id="dbgCache">0</span></div>
+  <div class="debug-row"><span class="debug-label">Errors</span><span class="debug-value error" id="dbgErrors">0</span></div>
+  <div class="debug-row"><span class="debug-label">Loaded images</span><span class="debug-value" id="dbgImages">0</span></div>
+  <div class="debug-row"><span class="debug-label">Loaded videos</span><span class="debug-value" id="dbgVideos">0</span></div>
+  <div class="debug-row"><span class="debug-label">Posts shown</span><span class="debug-value" id="dbgPosts">0</span></div>
+  <div class="debug-row"><span class="debug-label">Blacklisted</span><span class="debug-value error" id="dbgBlacklisted">0</span></div>
+  <div class="debug-row"><span class="debug-label">Memory (MB)</span><span class="debug-value" id="dbgMemory">-</span></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<button class="scroll-top" id="scrollTop" title="Scroll to top">↑</button>
+
 <script>
+// ── CONFIG ──
 const API_BASE = 'https://api.rule34.xxx/index.php';
 const AUTO_BASE = 'https://api.rule34.xxx/autocomplete.php';
-const AI_FILTER = '-ai -ai_created -ai_assisted -ai_generated';
+const CORS_PROXIES = ['https://corsproxy.io/?', 'https://api.allorigins.win/raw?url='];
+const AI_TAGS = ['-ai', '-ai_created', '-ai_assisted', '-ai_generated'];
 const API_KEY = '0fbe845fa16d24529e2279116af9acb2601218f80decc151c3c8abbbf8027ec18b7d8f4642f17ef6777674f5480c49a8dfb3ba8bf7aa98c1f0bab94ee188a0d9';
 const USER_ID = '5943229';
+const PAGE_SIZE = 30;
+const MAX_HISTORY = 30;
+const MAX_SAVED = 20;
+const AUTOCOMPLETE_DEBOUNCE = 250;
+const RETRY_DELAYS = [500, 1500, 4000];
+const INFINITE_SCROLL_THRESHOLD = 800;
 
-const isVideoUrl = url => url && (url.endsWith('.mp4') || url.endsWith('.webm'));
-
-let activeTags = [];
-let currentPage = 0;
-let allPosts = [];
-let lbIndex = 0;
-let acIndex = -1;
-let acTimeout = null;
+// ── STATE ──
+const state = {
+  tags: [],
+  filters: { rating: 'all', type: 'all', score: 0, hideAI: true },
+  blacklist: [],
+  history: [],
+  saved: [],
+  page: 0,
+  posts: [],
+  allLoaded: false,
+  lightboxIndex: -1,
+  isLoading: false,
+  debug: false,
+  filtersOpen: false,
+  activeRequests: 0,
+  totalRequests: 0,
+  cacheHits: 0,
+  errors: 0,
+  blacklistedCount: 0
+};
 
 const $ = id => document.getElementById(id);
 const searchInput = $('searchInput');
@@ -762,323 +1446,716 @@ const tagsBar = $('tagsBar');
 const gallery = $('gallery');
 const toolbar = $('toolbar');
 const resultInfo = $('resultInfo');
-const pagination = $('pagination');
+const sentinel = $('sentinel');
 const lightbox = $('lightbox');
 const lbContent = $('lbContent');
 const lbCounter = $('lbCounter');
 const lbTags = $('lbTags');
 
-// ── AUTOCOMPLETE ──
-searchInput.addEventListener('input', () => {
-  clearTimeout(acTimeout);
-  acIndex = -1;
-  const val = searchInput.value.trim();
-  if (!val) { autocompleteEl.classList.remove('active'); return; }
-  acTimeout = setTimeout(() => fetchAutocomplete(val), 250);
-});
+let acIndex = -1;
+let acTimeout = null;
+let fetchToken = 0;
+let fetchController = null;
+let player = null;
+let lazyObserver = null;
+let infiniteObserver = null;
+const requestCache = new Map();
+let loadedImages = new Set();
+let loadedVideos = 0;
 
-searchInput.addEventListener('keydown', e => {
-  const items = autocompleteEl.querySelectorAll('.autocomplete-item');
-  if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = Math.min(acIndex + 1, items.length - 1); updateAcHighlight(items); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = Math.max(acIndex - 1, 0); updateAcHighlight(items); }
-  else if (e.key === 'Enter') {
-    e.preventDefault();
-    if (acIndex >= 0 && items[acIndex]) {
-      addTag(items[acIndex].dataset.tag);
-      searchInput.value = '';
-      autocompleteEl.classList.remove('active');
-    } else if (searchInput.value.trim()) {
-      addTag(searchInput.value.trim());
-      searchInput.value = '';
-      autocompleteEl.classList.remove('active');
-    }
-  } else if (e.key === 'Escape') {
-    autocompleteEl.classList.remove('active');
+// ── UTILS ──
+const escapeHTML = s => String(s).replace(/[&<>"']/g, c => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
+
+const debounce = (fn, ms) => {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+};
+
+const isVideoUrl = url => !!url && (url.endsWith('.mp4') || url.endsWith('.webm'));
+const isGifUrl = url => !!url && url.endsWith('.gif');
+
+function getPostType(p) {
+  const url = p.file_url || p.sample_url || '';
+  if (isVideoUrl(url)) return 'video';
+  if (isGifUrl(url)) return 'gif';
+  return 'image';
+}
+
+function buildTagsQuery() {
+  const parts = [...state.tags];
+  if (state.filters.hideAI) parts.push(...AI_TAGS);
+  if (state.filters.rating !== 'all') parts.push(`rating:${state.filters.rating}`);
+  if (state.filters.type === 'video') parts.push('video');
+  else if (state.filters.type === 'gif') parts.push('animated');
+  else if (state.filters.type === 'image') parts.push('-video', '-animated');
+  if (state.filters.score > 0) parts.push(`score:>=${state.filters.score}`);
+  
+  const sort = $('sortSelect').value;
+  if (sort === 'id') parts.push('sort:id');
+  else if (sort === 'random') parts.push('sort:random');
+  else parts.push('sort:score:desc');
+  
+  return parts.join(' ');
+}
+
+function postMatchesBlacklist(p) {
+  if (!state.blacklist.length) return false;
+  const tags = (p.tags || '').toLowerCase().split(' ');
+  return state.blacklist.some(t => tags.includes(t.toLowerCase()));
+}
+
+// ── STORAGE ──
+const storage = {
+  get(key, fallback) {
+    try {
+      const v = localStorage.getItem(`r34_${key}`);
+      return v ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(`r34_${key}`, JSON.stringify(value)); } catch {}
   }
-});
+};
 
-function updateAcHighlight(items) {
-  items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+function loadState() {
+  state.blacklist = storage.get('blacklist', []);
+  state.history = storage.get('history', []);
+  state.saved = storage.get('saved', []);
+  state.filters = storage.get('filters', state.filters);
+  state.debug = storage.get('debug', false);
+}
+
+function saveBlacklist() { storage.set('blacklist', state.blacklist); }
+function saveHistory() { storage.set('history', state.history.slice(0, MAX_HISTORY)); }
+function saveSaved() { storage.set('saved', state.saved.slice(0, MAX_SAVED)); }
+function saveFilters() { storage.set('filters', state.filters); }
+
+function addToHistory(query) {
+  if (!query) return;
+  state.history = [query, ...state.history.filter(q => q !== query)].slice(0, MAX_HISTORY);
+  saveHistory();
+}
+
+// ── TOAST ──
+function toast(type, title, message = '', duration = 5000) {
+  const container = $('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `
+    <div class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '!' : type === 'warning' ? '!' : 'i'}</div>
+    <div class="toast-content">
+      <div class="toast-title">${escapeHTML(title)}</div>
+      ${message ? `<div class="toast-message">${escapeHTML(message)}</div>` : ''}
+    </div>
+  `;
+  el.addEventListener('click', () => removeToast(el));
+  container.appendChild(el);
+  setTimeout(() => removeToast(el), duration);
+}
+
+function removeToast(el) {
+  if (!el.parentElement) return;
+  el.classList.add('removing');
+  setTimeout(() => el.remove(), 300);
+}
+
+// ── API ──
+async function fetchWithRetry(url, retries = RETRY_DELAYS.length) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetch(url, { signal: fetchController?.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      if (err.name === 'AbortError') throw err;
+      if (i === retries) {
+        state.errors++;
+        updateDebug();
+        throw err;
+      }
+      await new Promise(r => setTimeout(r, RETRY_DELAYS[i]));
+    }
+  }
 }
 
 async function fetchAutocomplete(query) {
+  const encoded = encodeURIComponent(query);
+  
+  // Try direct first
   try {
-    const res = await fetch(`${AUTO_BASE}?q=${encodeURIComponent(query)}`);
-    if (!res.ok) return;
-    const data = await res.json();
-    renderAutocomplete(data, query);
+    const res = await fetch(`${AUTO_BASE}?q=${encoded}`, { signal: fetchController?.signal });
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    }
   } catch {}
+  
+  // Fallback to CORS proxies
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const res = await fetch(`${proxy}${encodeURIComponent(`${AUTO_BASE}?q=${encoded}`)}`, { signal: fetchController?.signal });
+      if (res.ok) {
+        const data = await res.json();
+        return data;
+      }
+    } catch {}
+  }
+  
+  return [];
 }
 
-function renderAutocomplete(results, query) {
-  if (!results || !results.length) { autocompleteEl.classList.remove('active'); return; }
-  autocompleteEl.innerHTML = results.slice(0, 12).map(r => {
-    const tag = r.value || r;
-    const count = r.count || '';
-    const highlighted = highlightMatch(tag, query);
-    return `<div class="autocomplete-item" data-tag="${tag}">${highlighted}${count ? `<span class="tag-count">${Number(count).toLocaleString()}</span>` : ''}</div>`;
-  }).join('');
-  autocompleteEl.classList.add('active');
-  acIndex = -1;
+async function fetchPosts() {
+  if (state.isLoading) return;
+  if (fetchController) fetchController.abort();
+  fetchController = new AbortController();
+  
+  const token = ++fetchToken;
+  const tags = buildTagsQuery();
+  
+  if (!tags) {
+    gallery.innerHTML = emptyHTML();
+    toolbar.classList.add('hidden');
+    $('pageInfo').textContent = '';
+    return;
+  }
+  
+  state.isLoading = true;
+  state.activeRequests++;
+  state.totalRequests++;
+  updateNetworkIndicator();
+  updateDebug();
+  
+  if (state.page === 0) {
+    gallery.innerHTML = skeletonHTML();
+    toolbar.classList.add('hidden');
+  } else {
+    $('loadMoreWrap').style.display = 'none';
+  }
+  
+  const url = `${API_BASE}?page=dapi&s=post&q=index&tags=${encodeURIComponent(tags)}&limit=${PAGE_SIZE}&pid=${state.page}&json=1&api_key=${API_KEY}&user_id=${USER_ID}`;
+  
+  const cacheKey = url;
+  let data;
+  
+  if (requestCache.has(cacheKey)) {
+    data = requestCache.get(cacheKey);
+    state.cacheHits++;
+  } else {
+    try {
+      data = await fetchWithRetry(url);
+      requestCache.set(cacheKey, data);
+      if (requestCache.size > 50) {
+        const first = requestCache.keys().next().value;
+        requestCache.delete(first);
+      }
+    } catch (err) {
+      if (err.name === 'AbortError' || token !== fetchToken) return;
+      state.isLoading = false;
+      state.activeRequests--;
+      updateNetworkIndicator();
+      updateDebug();
+      toast('error', 'Failed to load', err.message);
+      gallery.innerHTML = `<div class="empty-state"><div class="empty-icon">!</div><h2>Failed to load</h2><p>${escapeHTML(err.message)}</p></div>`;
+      return;
+    }
+  }
+  
+  if (token !== fetchToken) return;
+  
+  const posts = Array.isArray(data) ? data : (data.posts || []);
+  const filtered = posts.filter(p => !postMatchesBlacklist(p));
+  state.blacklistedCount += posts.length - filtered.length;
+  
+  if (state.page === 0) {
+    state.posts = filtered;
+  } else {
+    state.posts.push(...filtered);
+  }
+  
+  state.allLoaded = posts.length < PAGE_SIZE;
+  state.isLoading = false;
+  state.activeRequests--;
+  updateNetworkIndicator();
+  updateDebug();
+  
+  renderGallery();
+  renderPagination();
+  
+  if (state.page === 0) {
+    addToHistory(state.tags.join(' '));
+  }
+  
+  updateURL();
+}
 
-  autocompleteEl.querySelectorAll('.autocomplete-item').forEach(el => {
+// ── RENDER ──
+function renderTags() {
+  if (!state.tags.length) {
+    tagsBar.innerHTML = '';
+    return;
+  }
+  
+  tagsBar.innerHTML = state.tags.map((t, i) => {
+    const negated = t.startsWith('-');
+    const display = t.startsWith('-') ? t.slice(1) : t;
+    return `<span class="tag-pill${negated ? ' negated' : ''}" data-index="${i}">
+      ${negated ? '−' : ''}${escapeHTML(display)}
+      <button class="blacklist-btn" data-blacklist="${escapeHTML(t.replace(/^-/, ''))}" title="Blacklist this tag">⊘</button>
+      <button class="remove" data-remove="${i}" title="Remove tag">✕</button>
+    </span>`;
+  }).join('') + '<button class="clear-all" id="clearAllBtn">clear all</button>';
+  
+  tagsBar.querySelectorAll('[data-remove]').forEach(el => {
     el.addEventListener('click', () => {
-      addTag(el.dataset.tag);
-      searchInput.value = '';
-      autocompleteEl.classList.remove('active');
+      const i = parseInt(el.dataset.remove);
+      state.tags.splice(i, 1);
+      renderTags();
+      if (state.tags.length) {
+        state.page = 0;
+        fetchPosts();
+      } else {
+        gallery.innerHTML = emptyHTML();
+        toolbar.classList.add('hidden');
+        $('pageInfo').textContent = '';
+        updateURL();
+      }
+    });
+  });
+  
+  tagsBar.querySelectorAll('[data-blacklist]').forEach(el => {
+    el.addEventListener('click', () => {
+      const tag = el.dataset.blacklist;
+      if (!state.blacklist.includes(tag)) {
+        state.blacklist.push(tag);
+        saveBlacklist();
+        toast('success', 'Added to blacklist', tag);
+        state.page = 0;
+        fetchPosts();
+      }
+    });
+  });
+  
+  const clearBtn = $('clearAllBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      state.tags = [];
+      renderTags();
+      gallery.innerHTML = emptyHTML();
+      toolbar.classList.add('hidden');
+      $('pageInfo').textContent = '';
+      updateURL();
+    });
+  }
+}
+
+function renderGallery() {
+  if (!state.posts.length) {
+    gallery.innerHTML = `<div class="empty-state"><div class="empty-icon">◌</div><h2>No results</h2><p>Try different tags or check your spelling.</p></div>`;
+    toolbar.classList.add('hidden');
+    return;
+  }
+  
+  toolbar.classList.remove('hidden');
+  
+  const startIndex = state.page === 0 ? 0 : state.posts.length - PAGE_SIZE;
+  const newPosts = state.page === 0 ? state.posts : state.posts.slice(-PAGE_SIZE);
+  
+  if (state.page === 0) {
+    gallery.innerHTML = newPosts.map((p, i) => renderPost(p, i)).join('');
+  } else {
+    const fragment = document.createElement('div');
+    fragment.innerHTML = newPosts.map((p, i) => renderPost(p, state.posts.length - PAGE_SIZE + i)).join('');
+    while (fragment.firstElementChild) {
+      gallery.appendChild(fragment.firstElementChild);
+    }
+  }
+  
+  resultInfo.innerHTML = `<strong>${state.posts.length}</strong> results · page <strong>${state.page + 1}</strong>`;
+  
+  // Setup lazy loading
+  setupLazyLoading();
+  
+  // Setup video hover preview (thumbnail only, no video load)
+  gallery.querySelectorAll('.gallery-item[data-type="video"]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const img = el.querySelector('img');
+      if (img) img.style.transform = 'scale(1.03)';
+    });
+    el.addEventListener('mouseleave', () => {
+      const img = el.querySelector('img');
+      if (img) img.style.transform = '';
     });
   });
 }
 
+function renderPost(p, index) {
+  const fileUrl = p.file_url || p.sample_url || '';
+  const type = getPostType(p);
+  const thumbUrl = p.preview_url || p.sample_url || fileUrl;
+  const tags = (p.tags || '').split(' ').filter(Boolean).slice(0, 8);
+  const delay = Math.min((index % PAGE_SIZE) * 0.03, 0.5);
+  
+  const badges = [
+    `<span class="badge type-${type}">${type.toUpperCase()}</span>`
+  ];
+  
+  if (p.score !== undefined) {
+    badges.push(`<span class="badge score">▲ ${p.score}</span>`);
+  }
+  
+  return `<div class="gallery-item" data-index="${index}" data-type="${type}" style="animation-delay:${delay}s">
+    <img data-src="${escapeHTML(thumbUrl)}" alt="" class="lazy" style="aspect-ratio:${p.width || 1}/${p.height || 1}; background:var(--surface-2)">
+    <div class="item-badges">${badges.join('')}</div>
+    <div class="gallery-overlay">
+      <div class="overlay-tags">${tags.map(t => `<span class="overlay-tag">${escapeHTML(t)}</span>`).join('')}</div>
+      <div class="overlay-stats">
+        <span>▲ ${p.score ?? 0}</span>
+        <span>◫ ${p.width ?? '?'}×${p.height ?? '?'}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setupLazyLoading() {
+  if (!lazyObserver) {
+    lazyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.dataset.src;
+          if (src) {
+            img.src = src;
+            img.onload = () => {
+              loadedImages.add(src);
+              updateDebug();
+            };
+            img.onerror = () => {
+              img.src = img.dataset.src = '';
+              img.style.background = 'var(--surface-3)';
+            };
+            lazyObserver.unobserve(img);
+          }
+        }
+      });
+    }, { rootMargin: '200px' });
+  }
+  
+  gallery.querySelectorAll('img.lazy:not([src])').forEach(img => {
+    lazyObserver.observe(img);
+  });
+}
+
+function renderPagination() {
+  const pageInfo = $('pageInfo');
+  const loadMoreWrap = $('loadMoreWrap');
+  
+  if (state.allLoaded) {
+    loadMoreWrap.style.display = 'none';
+    pageInfo.textContent = state.posts.length > 0 ? `End of results · ${state.posts.length} posts` : '';
+  } else {
+    loadMoreWrap.style.display = 'block';
+    pageInfo.textContent = '';
+  }
+}
+
+function renderAutocomplete(results, query) {
+  if (!results || !results.length) {
+    autocompleteEl.classList.remove('active');
+    return;
+  }
+  
+  const historyMatches = state.history.filter(q => 
+    q.toLowerCase().includes(query.toLowerCase())
+  ).slice(0, 3);
+  
+  let html = '';
+  
+  if (historyMatches.length) {
+    html += `<div class="autocomplete-header"><span>History</span><button id="clearHistory">Clear</button></div>`;
+    html += historyMatches.map(q => {
+      const highlighted = highlightMatch(q, query);
+      return `<div class="autocomplete-item" data-history="${escapeHTML(q)}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${highlighted}
+        <button class="history-remove" data-remove-history="${escapeHTML(q)}">✕</button>
+      </div>`;
+    }).join('');
+  }
+  
+  html += `<div class="autocomplete-header">Tags</div>`;
+  html += results.slice(0, 10).map(r => {
+    const tag = r.value || r;
+    const count = r.count || '';
+    const highlighted = highlightMatch(tag, query);
+    return `<div class="autocomplete-item" data-tag="${escapeHTML(tag)}">
+      ${highlighted}
+      ${count ? `<span class="tag-count">${Number(count).toLocaleString()}</span>` : ''}
+    </div>`;
+  }).join('');
+  
+  autocompleteEl.innerHTML = html;
+  autocompleteEl.classList.add('active');
+  acIndex = -1;
+  
+  autocompleteEl.querySelectorAll('[data-tag]').forEach(el => {
+    el.addEventListener('click', () => {
+      addTag(el.dataset.tag);
+      searchInput.value = '';
+      autocompleteEl.classList.remove('active');
+      searchInput.focus();
+    });
+  });
+  
+  autocompleteEl.querySelectorAll('[data-history]').forEach(el => {
+    el.addEventListener('click', () => {
+      const q = el.dataset.history;
+      state.tags = q.split(/\s+/).filter(Boolean);
+      renderTags();
+      searchInput.value = '';
+      autocompleteEl.classList.remove('active');
+      state.page = 0;
+      fetchPosts();
+    });
+  });
+  
+  autocompleteEl.querySelectorAll('[data-remove-history]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const q = el.dataset.removeHistory;
+      state.history = state.history.filter(h => h !== q);
+      saveHistory();
+      autocompleteEl.classList.remove('active');
+    });
+  });
+  
+  const clearBtn = $('clearHistory');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      state.history = [];
+      saveHistory();
+      autocompleteEl.classList.remove('active');
+    });
+  }
+}
+
 function highlightMatch(tag, query) {
   const idx = tag.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return tag;
-  return tag.slice(0, idx) + `<span class="match">${tag.slice(idx, idx + query.length)}</span>` + tag.slice(idx + query.length);
+  if (idx === -1) return escapeHTML(tag);
+  return escapeHTML(tag.slice(0, idx)) +
+    `<span class="match">${escapeHTML(tag.slice(idx, idx + query.length))}</span>` +
+    escapeHTML(tag.slice(idx + query.length));
+}
+
+function renderFiltersUI() {
+  document.querySelectorAll('.filter-buttons').forEach(group => {
+    const filterType = group.dataset.filter;
+    const activeValue = state.filters[filterType];
+    group.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === activeValue);
+    });
+  });
+  
+  $('scoreSlider').value = state.filters.score;
+  $('scoreValue').textContent = state.filters.score;
+  $('aiFilter').checked = state.filters.hideAI;
 }
 
 // ── TAGS ──
 function addTag(tag) {
   tag = tag.toLowerCase().trim();
-  if (!tag || activeTags.includes(tag)) return;
-  activeTags.push(tag);
+  if (!tag || state.tags.includes(tag)) return;
+  state.tags.push(tag);
   renderTags();
+  state.page = 0;
   fetchPosts();
-}
-
-function removeTag(tag) {
-  activeTags = activeTags.filter(t => t !== tag);
-  renderTags();
-  if (activeTags.length) fetchPosts();
-  else { gallery.innerHTML = emptyHTML(); toolbar.classList.add('hidden'); pagination.innerHTML = ''; }
-}
-
-function renderTags() {
-  tagsBar.innerHTML = activeTags.map(t => `<span class="tag-pill">${t}<span class="remove" data-tag="${t}">&times;</span></span>`).join('');
-  tagsBar.querySelectorAll('.remove').forEach(el => el.addEventListener('click', () => removeTag(el.dataset.tag)));
-}
-
-// ── FETCH POSTS ──
-$('searchBtn').addEventListener('click', () => {
-  const val = searchInput.value.trim();
-  if (val) { addTag(val); searchInput.value = ''; }
-});
-
-searchInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !autocompleteEl.classList.contains('active')) {
-    const val = searchInput.value.trim();
-    if (val) { addTag(val); searchInput.value = ''; }
-  }
-});
-
-$('sortSelect').addEventListener('change', () => { currentPage = 0; fetchPosts(); });
-
-async function fetchPosts() {
-  if (!activeTags.length) return;
-  gallery.innerHTML = loadingHTML();
-  toolbar.classList.add('hidden');
-  pagination.innerHTML = '';
-
-  const tags = [...activeTags, AI_FILTER].join(' ');
-  const sort = $('sortSelect').value;
-  const sortParam = sort === 'id' ? 'sort:id' : sort === 'random' ? 'sort:random' : 'sort:score:desc';
-  const limit = 20;
-
-  const url = `${API_BASE}?page=dapi&s=post&q=index&tags=${encodeURIComponent(tags + ' ' + sortParam)}&limit=${limit}&pid=${currentPage}&json=1&api_key=${API_KEY}&user_id=${USER_ID}`;
-
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    allPosts = Array.isArray(data) ? data : (data.posts || []);
-    renderGallery();
-  } catch (err) {
-    gallery.innerHTML = `<div class="empty-state"><div class="empty-icon">!</div><h2>Failed to load</h2><p>${err.message}</p></div>`;
-  }
-}
-
-function renderGallery() {
-  if (!allPosts.length) {
-    gallery.innerHTML = `<div class="empty-state"><div class="empty-icon">◌</div><h2>No results</h2><p>Try different tags or check your spelling.</p></div>`;
-    toolbar.style.display = 'none';
-    pagination.innerHTML = '';
-    return;
-  }
-
-  toolbar.classList.remove('hidden');
-  resultInfo.innerHTML = `<strong>${allPosts.length}</strong> results for <strong>${activeTags.join(' + ')}</strong>`;
-
-  gallery.innerHTML = allPosts.map((p, i) => {
-    const fileUrl = p.file_url || p.sample_url || p.preview_url || '';
-    const isVideo = isVideoUrl(fileUrl);
-    const tags = (p.tags || '').split(' ').slice(0, 5);
-    const delay = Math.min(i * 0.04, 0.6);
-    return `<div class="gallery-item" data-index="${i}" style="animation-delay:${delay}s">
-      ${isVideo
-        ? `<video src="${fileUrl}" muted preload="auto" playsinline loop></video><div class="video-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>MP4</div>`
-        : `<img src="${p.sample_url || p.preview_url || fileUrl}" alt="" loading="lazy">`
-      }
-      <div class="gallery-overlay">
-        <div class="overlay-tags">${tags.map(t => `<span class="overlay-tag">${t}</span>`).join('')}</div>
-        <div class="overlay-stats">
-          <span>▲ ${p.score ?? 0}</span>
-          <span>♥ ${p.rating ?? '?'}</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  gallery.querySelectorAll('.gallery-item').forEach(el => {
-    el.addEventListener('click', () => openLightbox(parseInt(el.dataset.index)));
-    const video = el.querySelector('video');
-    if (video) {
-      let cycleTimeout = null;
-
-      function startCycle() {
-        video.currentTime = 0;
-        video.muted = true;
-        video.play().catch(() => {});
-        cycleTimeout = setTimeout(function tick() {
-          video.pause();
-          video.currentTime += 10;
-          cycleTimeout = setTimeout(() => {
-            video.play().catch(() => {});
-            cycleTimeout = setTimeout(tick, 3000);
-          }, 200);
-        }, 3000);
-      }
-
-      function stopCycle() {
-        clearTimeout(cycleTimeout);
-        video.pause();
-        video.currentTime = 0;
-      }
-
-      el.addEventListener('mouseenter', startCycle);
-      el.addEventListener('mouseleave', stopCycle);
-    }
-  });
-
-  renderPagination();
-}
-
-// ── PAGINATION ──
-function renderPagination() {
-  const pages = [];
-  const total = 20;
-  let start = Math.max(0, currentPage - 3);
-  let end = Math.min(total, currentPage + 4);
-
-  pagination.innerHTML = '';
-
-  const prevBtn = document.createElement('button');
-  prevBtn.className = 'page-btn';
-  prevBtn.innerHTML = '‹';
-  prevBtn.disabled = currentPage === 0;
-  prevBtn.addEventListener('click', () => { currentPage--; fetchPosts(); });
-  pagination.appendChild(prevBtn);
-
-  if (start > 0) {
-    addPageBtn(0);
-    if (start > 1) addEllipsis();
-  }
-
-  for (let i = start; i < end; i++) addPageBtn(i);
-
-  if (end < total) {
-    if (end < total - 1) addEllipsis();
-    addPageBtn(total - 1);
-  }
-
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'page-btn';
-  nextBtn.innerHTML = '›';
-  nextBtn.disabled = currentPage >= total - 1;
-  nextBtn.addEventListener('click', () => { currentPage++; fetchPosts(); });
-  pagination.appendChild(nextBtn);
-
-  function addPageBtn(i) {
-    const btn = document.createElement('button');
-    btn.className = `page-btn${i === currentPage ? ' active' : ''}`;
-    btn.textContent = i + 1;
-    btn.addEventListener('click', () => { currentPage = i; fetchPosts(); });
-    pagination.appendChild(btn);
-  }
-
-  function addEllipsis() {
-    const el = document.createElement('span');
-    el.className = 'page-ellipsis';
-    el.textContent = '…';
-    pagination.appendChild(el);
-  }
 }
 
 // ── LIGHTBOX ──
 function openLightbox(index) {
-  lbIndex = index;
-  resetZoom();
+  state.lightboxIndex = index;
   renderLightbox();
   lightbox.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox() {
-  // Stop any playing video before closing
-  const video = lbContent.querySelector('video');
-  if (video) { video.pause(); video.src = ''; }
+  destroyPlayer();
   lightbox.classList.remove('active');
   document.body.style.overflow = '';
   resetZoom();
+  state.lightboxIndex = -1;
+}
+
+function destroyPlayer() {
+  if (player) {
+    try { player.destroy(); } catch {}
+    player = null;
+  }
 }
 
 function renderLightbox() {
-  const p = allPosts[lbIndex];
+  const p = state.posts[state.lightboxIndex];
   if (!p) return;
+  
+  destroyPlayer();
+  
   const fileUrl = p.file_url || p.sample_url || '';
-  const isVideo = isVideoUrl(fileUrl);
-
-  if (isVideo) {
-    lbContent.innerHTML = `<video src="${fileUrl}" controls autoplay playsinline muted style="max-width:90vw;max-height:85vh;border-radius:var(--radius-lg)"></video>`;
-    const video = lbContent.querySelector('video');
-    video.play().catch(() => {});
-    video.addEventListener('canplay', () => {
-      video.muted = false;
-      video.play().catch(() => { video.muted = true; });
-    }, { once: true });
-    $('lbZoomLevel').parentElement.style.display = 'none';
+  const type = getPostType(p);
+  
+  if (type === 'video') {
+    lbContent.innerHTML = '';
+    const container = document.createElement('div');
+    container.className = 'artplayer-container';
+    lbContent.appendChild(container);
+    
+    $('lbZoomControls').style.display = 'none';
+    
+    player = new Artplayer({
+      container: container,
+      url: fileUrl,
+      volume: 0.7,
+      autoplay: true,
+      pip: true,
+      autoSize: false,
+      autoMini: false,
+      screenshot: false,
+      setting: true,
+      loop: true,
+      flip: false,
+      playbackRate: true,
+      aspectRatio: true,
+      fullscreen: true,
+      fullscreenWeb: true,
+      miniProgressBar: true,
+      mutex: true,
+      backdrop: false,
+      theme: '#c8956c',
+      lang: navigator.language.startsWith('zh') ? 'zh-cn' : 'en',
+      moreVideoAttr: {
+        preload: 'metadata',
+        playsinline: true,
+        crossOrigin: 'anonymous'
+      },
+      settings: [
+        {
+          html: 'Speed',
+          selector: [
+            { html: '0.5x', value: 0.5 },
+            { html: '0.75x', value: 0.75 },
+            { html: '1x', value: 1 },
+            { html: '1.25x', value: 1.25 },
+            { html: '1.5x', value: 1.5 },
+            { html: '2x', value: 2 }
+          ],
+          onSelect: (item) => {
+            player.playbackRate = item.value;
+            return item.html;
+          }
+        }
+      ]
+    });
+    
+    loadedVideos++;
+    updateDebug();
+    
   } else {
-    lbContent.innerHTML = `<img src="${fileUrl}" alt="" style="max-width:90vw;max-height:85vh;border-radius:var(--radius-lg)">`;
-    $('lbZoomLevel').parentElement.style.display = 'flex';
+    lbContent.innerHTML = `<img src="${escapeHTML(fileUrl)}" alt="" data-fallback="${escapeHTML(p.sample_url || '')}">`;
+    $('lbZoomControls').style.display = 'flex';
+    
+    const img = lbContent.querySelector('img');
+    img.addEventListener('error', () => {
+      const fb = img.dataset.fallback;
+      if (fb && img.src !== fb) img.src = fb;
+    }, { once: true });
+    
+    loadedImages.add(fileUrl);
+    updateDebug();
   }
-
-  lbCounter.textContent = `${lbIndex + 1} / ${allPosts.length}`;
-  lbTags.textContent = activeTags.join(' + ');
+  
+  $('lbPrev').disabled = state.lightboxIndex === 0;
+  $('lbNext').disabled = state.lightboxIndex >= state.posts.length - 1;
+  lbCounter.textContent = `${state.lightboxIndex + 1} / ${state.posts.length}`;
+  lbTags.textContent = state.tags.join(' + ');
+  
+  preloadNeighbors();
 }
 
-$('lbClose').addEventListener('click', closeLightbox);
-$('lbPrev').addEventListener('click', () => { if (lbIndex > 0) { lbIndex--; resetZoom(); renderLightbox(); } });
-$('lbNext').addEventListener('click', () => { if (lbIndex < allPosts.length - 1) { lbIndex++; resetZoom(); renderLightbox(); } });
+function preloadNeighbors() {
+  [state.lightboxIndex - 1, state.lightboxIndex + 1].forEach(i => {
+    const p = state.posts[i];
+    if (!p) return;
+    const url = p.file_url || p.sample_url || '';
+    const type = getPostType(p);
+    if (url && type === 'image') {
+      const im = new Image();
+      im.src = url;
+    }
+  });
+}
 
-lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+function navPrev() {
+  if (state.lightboxIndex > 0) {
+    state.lightboxIndex--;
+    resetZoom();
+    renderLightbox();
+  }
+}
 
-document.addEventListener('keydown', e => {
-  if (!lightbox.classList.contains('active')) return;
-  if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowLeft' && lbIndex > 0) { lbIndex--; renderLightbox(); }
-  if (e.key === 'ArrowRight' && lbIndex < allPosts.length - 1) { lbIndex++; renderLightbox(); }
-});
+function navNext() {
+  if (state.lightboxIndex < state.posts.length - 1) {
+    state.lightboxIndex++;
+    resetZoom();
+    renderLightbox();
+  }
+}
 
-// ── LIGHTBOX ZOOM ──
+function downloadCurrent() {
+  const p = state.posts[state.lightboxIndex];
+  if (!p) return;
+  const url = p.file_url || p.sample_url || '';
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `r34_${p.id}.${url.split('.').pop()}`;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast('success', 'Download started');
+}
+
+function copyCurrentURL() {
+  const p = state.posts[state.lightboxIndex];
+  if (!p) return;
+  const url = p.file_url || p.sample_url || '';
+  navigator.clipboard.writeText(url).then(() => {
+    toast('success', 'URL copied to clipboard');
+  });
+}
+
+function openOriginal() {
+  const p = state.posts[state.lightboxIndex];
+  if (!p) return;
+  const url = p.file_url || p.sample_url || '';
+  window.open(url, '_blank');
+}
+
+// ── ZOOM ──
 let zoomScale = 1;
 let zoomTX = 0;
 let zoomTY = 0;
 let isPanning = false;
-let panStartX = 0;
-let panStartY = 0;
-let panStartTX = 0;
-let panStartTY = 0;
-const ZOOM_MIN = 0.5;
-const ZOOM_MAX = 8;
-const ZOOM_STEP = 0.3;
+let panStartX = 0, panStartY = 0, panStartTX = 0, panStartTY = 0;
+const ZOOM_MIN = 0.5, ZOOM_MAX = 8, ZOOM_STEP = 0.3;
+
+function isCurrentVideo() {
+  const p = state.posts[state.lightboxIndex];
+  return p && getPostType(p) === 'video';
+}
 
 function applyZoom() {
   if (zoomScale <= 1.01) {
@@ -1095,71 +2172,308 @@ function applyZoom() {
 }
 
 function zoomAt(cursorX, cursorY, newScale) {
-  const rect = lbContent.getBoundingClientRect();
-  const cx = cursorX - rect.left;
-  const cy = cursorY - rect.top;
-  
-  const imgX = (cx - zoomTX) / zoomScale;
-  const imgY = (cy - zoomTY) / zoomScale;
-  
-  zoomScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
-  
-  zoomTX = cx - imgX * zoomScale;
-  zoomTY = cy - imgY * zoomScale;
-  
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const clamped = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
+  const px = (cursorX - cx - zoomTX) / zoomScale;
+  const py = (cursorY - cy - zoomTY) / zoomScale;
+  zoomTX = cursorX - cx - px * clamped;
+  zoomTY = cursorY - cy - py * clamped;
+  zoomScale = clamped;
   applyZoom();
 }
 
 function zoomIn() {
-  const rect = lbContent.getBoundingClientRect();
-  zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale + ZOOM_STEP);
+  if (isCurrentVideo()) return;
+  zoomAt(window.innerWidth / 2 + zoomTX, window.innerHeight / 2 + zoomTY, zoomScale + ZOOM_STEP);
 }
 
 function zoomOut() {
-  const rect = lbContent.getBoundingClientRect();
-  zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale - ZOOM_STEP);
+  if (isCurrentVideo()) return;
+  zoomAt(window.innerWidth / 2 + zoomTX, window.innerHeight / 2 + zoomTY, zoomScale - ZOOM_STEP);
 }
 
 function resetZoom() {
   zoomScale = 1;
   zoomTX = 0;
   zoomTY = 0;
+  isPanning = false;
   applyZoom();
 }
+
+// ── DEBUG ──
+function updateDebug() {
+  if (!state.debug) return;
+  $('dbgActive').textContent = state.activeRequests;
+  $('dbgTotal').textContent = state.totalRequests;
+  $('dbgCache').textContent = state.cacheHits;
+  $('dbgErrors').textContent = state.errors;
+  $('dbgImages').textContent = loadedImages.size;
+  $('dbgVideos').textContent = loadedVideos;
+  $('dbgPosts').textContent = state.posts.length;
+  $('dbgBlacklisted').textContent = state.blacklistedCount;
+  
+  if (performance.memory) {
+    $('dbgMemory').textContent = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+  }
+}
+
+function toggleDebug() {
+  state.debug = !state.debug;
+  storage.set('debug', state.debug);
+  $('debugOverlay').classList.toggle('active', state.debug);
+  $('debugBtn').classList.toggle('active', state.debug);
+  if (state.debug) updateDebug();
+}
+
+function updateNetworkIndicator() {
+  $('networkIndicator').style.display = state.activeRequests > 0 ? 'block' : 'none';
+}
+
+// ── URL STATE ──
+function updateURL() {
+  const params = [];
+  if (state.tags.length) params.push(`tags=${encodeURIComponent(state.tags.join(' '))}`);
+  if (state.page > 0) params.push(`page=${state.page + 1}`);
+  const hash = params.length ? `#${params.join('&')}` : '';
+  history.replaceState(null, '', location.pathname + location.search + hash);
+}
+
+function parseURL() {
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+  const params = new URLSearchParams(hash);
+  if (params.has('tags')) {
+    state.tags = params.get('tags').split(/\s+/).filter(Boolean);
+    renderTags();
+  }
+  if (params.has('page')) {
+    state.page = Math.max(0, parseInt(params.get('page')) - 1);
+  }
+}
+
+// ── HTML TEMPLATES ──
+function emptyHTML() {
+  return `<div class="empty-state"><div class="empty-icon">◈</div><h2>Search for tags</h2><p>Type tags above to discover images and videos. Use <code>-tag</code> to exclude, <code>rating:safe</code> to filter.</p></div>`;
+}
+
+function skeletonHTML() {
+  const heights = [200, 280, 320, 240, 360, 180, 300, 260, 220, 340, 280, 200];
+  return `<div class="skeleton-grid">${
+    heights.map((h, i) => `<div class="skeleton-item" style="height:${h}px; animation-delay:${i * 0.05}s"></div>`).join('')
+  }</div>`;
+}
+
+// ── MODALS ──
+function openModal(id) {
+  $(id).classList.add('active');
+  if (id === 'blacklistModal') renderBlacklistModal();
+}
+
+function closeModal(id) {
+  $(id).classList.remove('active');
+}
+
+function renderBlacklistModal() {
+  const container = $('blacklistTags');
+  if (!state.blacklist.length) {
+    container.innerHTML = '<div class="blacklist-empty">No blacklisted tags</div>';
+    return;
+  }
+  container.innerHTML = state.blacklist.map(t => 
+    `<span class="blacklist-tag">${escapeHTML(t)}<button data-remove-bl="${escapeHTML(t)}">✕</button></span>`
+  ).join('');
+  container.querySelectorAll('[data-remove-bl]').forEach(el => {
+    el.addEventListener('click', () => {
+      const tag = el.dataset.removeBl;
+      state.blacklist = state.blacklist.filter(t => t !== tag);
+      saveBlacklist();
+      renderBlacklistModal();
+      toast('success', 'Removed from blacklist', tag);
+    });
+  });
+}
+
+// ── INFINITE SCROLL ──
+function setupInfiniteScroll() {
+  if (!infiniteObserver) {
+    infiniteObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !state.isLoading && !state.allLoaded && state.tags.length > 0) {
+          state.page++;
+          fetchPosts();
+        }
+      });
+    }, { rootMargin: `${INFINITE_SCROLL_THRESHOLD}px` });
+  }
+  infiniteObserver.observe(sentinel);
+}
+
+// ── EVENTS ──
+searchInput.addEventListener('input', () => {
+  clearTimeout(acTimeout);
+  acIndex = -1;
+  const val = searchInput.value.trim();
+  if (!val) { autocompleteEl.classList.remove('active'); return; }
+  acTimeout = setTimeout(() => fetchAutocomplete(val).then(data => renderAutocomplete(data, val)), AUTOCOMPLETE_DEBOUNCE);
+});
+
+searchInput.addEventListener('keydown', e => {
+  const items = autocompleteEl.querySelectorAll('.autocomplete-item');
+  
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acIndex = Math.min(acIndex + 1, items.length - 1);
+    updateAcHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acIndex = Math.max(acIndex - 1, 0);
+    updateAcHighlight(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const listOpen = autocompleteEl.classList.contains('active');
+    if (listOpen && acIndex >= 0 && items[acIndex]) {
+      const tag = items[acIndex].dataset.tag;
+      const history = items[acIndex].dataset.history;
+      if (tag) addTag(tag);
+      else if (history) {
+        state.tags = history.split(/\s+/).filter(Boolean);
+        renderTags();
+        state.page = 0;
+        fetchPosts();
+      }
+    } else {
+      const val = searchInput.value.trim();
+      if (!val) return;
+      val.split(/\s+/).filter(Boolean).forEach(t => addTag(t));
+    }
+    searchInput.value = '';
+    autocompleteEl.classList.remove('active');
+    acIndex = -1;
+  } else if (e.key === 'Escape') {
+    autocompleteEl.classList.remove('active');
+    acIndex = -1;
+  }
+});
+
+function updateAcHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+  if (items[acIndex]) items[acIndex].scrollIntoView({ block: 'nearest' });
+}
+
+$('searchBtn').addEventListener('click', () => {
+  const val = searchInput.value.trim();
+  if (val) {
+    val.split(/\s+/).filter(Boolean).forEach(t => addTag(t));
+    searchInput.value = '';
+    autocompleteEl.classList.remove('active');
+  }
+});
+
+$('logo').addEventListener('click', () => {
+  state.tags = [];
+  state.page = 0;
+  renderTags();
+  gallery.innerHTML = emptyHTML();
+  toolbar.classList.add('hidden');
+  $('pageInfo').textContent = '';
+  updateURL();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+$('sortSelect').addEventListener('change', () => {
+  state.page = 0;
+  fetchPosts();
+});
+
+$('jumpInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const page = Math.max(1, parseInt($('jumpInput').value) || 1);
+    state.page = page - 1;
+    state.posts = [];
+    state.allLoaded = false;
+    gallery.innerHTML = '';
+    fetchPosts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+$('loadMoreBtn').addEventListener('click', () => {
+  if (!state.isLoading && !state.allLoaded) {
+    state.page++;
+    fetchPosts();
+  }
+});
+
+// Filters
+$('filtersBtn').addEventListener('click', () => {
+  state.filtersOpen = !state.filtersOpen;
+  $('filtersPanel').classList.toggle('open', state.filtersOpen);
+  $('filtersBtn').classList.toggle('active', state.filtersOpen);
+});
+
+document.querySelectorAll('.filter-buttons').forEach(group => {
+  group.addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    const filterType = group.dataset.filter;
+    state.filters[filterType] = btn.dataset.value;
+    saveFilters();
+    renderFiltersUI();
+    state.page = 0;
+    fetchPosts();
+  });
+});
+
+$('scoreSlider').addEventListener('input', e => {
+  state.filters.score = parseInt(e.target.value);
+  $('scoreValue').textContent = state.filters.score;
+});
+
+$('scoreSlider').addEventListener('change', () => {
+  saveFilters();
+  state.page = 0;
+  fetchPosts();
+});
+
+$('aiFilter').addEventListener('change', e => {
+  state.filters.hideAI = e.target.checked;
+  saveFilters();
+  state.page = 0;
+  fetchPosts();
+});
+
+// Lightbox
+$('lbClose').addEventListener('click', closeLightbox);
+$('lbPrev').addEventListener('click', navPrev);
+$('lbNext').addEventListener('click', navNext);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+$('lbDownload').addEventListener('click', downloadCurrent);
+$('lbCopy').addEventListener('click', copyCurrentURL);
+$('lbOpen').addEventListener('click', openOriginal);
 
 $('lbZoomIn').addEventListener('click', e => { e.stopPropagation(); zoomIn(); });
 $('lbZoomOut').addEventListener('click', e => { e.stopPropagation(); zoomOut(); });
 $('lbZoomReset').addEventListener('click', e => { e.stopPropagation(); resetZoom(); });
 
-// Click to zoom at cursor (images only)
 lbContent.addEventListener('click', e => {
-  const p = allPosts[lbIndex];
-  if (!p || isVideoUrl(p.file_url || p.sample_url || '')) return;
+  if (isCurrentVideo()) return;
   e.stopPropagation();
-  
-  if (zoomScale <= 1.01) {
-    zoomAt(e.clientX, e.clientY, 2.5);
-  } else {
-    resetZoom();
-  }
+  if (zoomScale <= 1.01) zoomAt(e.clientX, e.clientY, 2.5);
+  else resetZoom();
 });
 
-// Wheel zoom at cursor
 lbContent.addEventListener('wheel', e => {
-  const p = allPosts[lbIndex];
-  if (!p || isVideoUrl(p.file_url || p.sample_url || '')) return;
+  if (isCurrentVideo()) return;
   e.preventDefault();
   e.stopPropagation();
-  
   const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
   zoomAt(e.clientX, e.clientY, zoomScale + delta);
 }, { passive: false });
 
-// Pan when zoomed
 lbContent.addEventListener('mousedown', e => {
-  const p = allPosts[lbIndex];
-  if (!p || isVideoUrl(p.file_url || p.sample_url || '') || zoomScale <= 1.01) return;
-  if (e.target.tagName === 'VIDEO') return;
+  if (isCurrentVideo() || zoomScale <= 1.01) return;
   isPanning = true;
   panStartX = e.clientX;
   panStartY = e.clientY;
@@ -1179,29 +2493,160 @@ document.addEventListener('mousemove', e => {
 document.addEventListener('mouseup', () => {
   if (isPanning) {
     isPanning = false;
-    lbContent.style.cursor = zoomScale > 1.01 ? 'grab' : 'zoom-in';
+    lbContent.style.cursor = zoomScale > 1.01 ? 'grab' : '';
   }
 });
 
-// Keyboard zoom
-document.addEventListener('keydown', e => {
-  if (!lightbox.classList.contains('active')) return;
-  if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomIn(); }
-  if (e.key === '-') { e.preventDefault(); zoomOut(); }
-  if (e.key === '0') { e.preventDefault(); resetZoom(); }
+// Touch swipe
+let touchStartX = 0, touchStartY = 0, touchActive = false;
+lightbox.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1 || zoomScale > 1.01) { touchActive = false; return; }
+  touchActive = true;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+lightbox.addEventListener('touchend', e => {
+  if (!touchActive || zoomScale > 1.01) return;
+  touchActive = false;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx > 0) navPrev(); else navNext();
+  }
+}, { passive: true });
+
+// Gallery item clicks
+gallery.addEventListener('click', e => {
+  const item = e.target.closest('.gallery-item');
+  if (item) openLightbox(parseInt(item.dataset.index));
 });
-function loadingHTML() {
-  return `<div class="loading-state"><div class="spinner"></div><p>Loading gallery...</p></div>`;
-}
 
-function emptyHTML() {
-  return `<div class="empty-state"><div class="empty-icon">◈</div><h2>Search for tags</h2><p>Type tags above to discover images and videos from the gallery.</p></div>`;
-}
+// Keyboard
+document.addEventListener('keydown', e => {
+  const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+  
+  if (e.key === '/' && !isInput && !lightbox.classList.contains('active')) {
+    e.preventDefault();
+    searchInput.focus();
+    return;
+  }
+  
+  if (e.key === '?' && !isInput && !lightbox.classList.contains('active')) {
+    e.preventDefault();
+    openModal('shortcutsModal');
+    return;
+  }
+  
+  if (e.key === '`' && !isInput) {
+    e.preventDefault();
+    toggleDebug();
+    return;
+  }
+  
+  if (e.key === 'f' && !isInput && !lightbox.classList.contains('active')) {
+    e.preventDefault();
+    state.filtersOpen = !state.filtersOpen;
+    $('filtersPanel').classList.toggle('open', state.filtersOpen);
+    $('filtersBtn').classList.toggle('active', state.filtersOpen);
+    return;
+  }
+  
+  if (!lightbox.classList.contains('active')) return;
+  
+  if (e.key === 'Escape') closeLightbox();
+  else if (e.key === 'ArrowLeft' && !player) navPrev();
+  else if (e.key === 'ArrowRight' && !player) navNext();
+  else if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomIn(); }
+  else if (e.key === '-') { e.preventDefault(); zoomOut(); }
+  else if (e.key === '0') { e.preventDefault(); resetZoom(); }
+  else if (e.key === 'd' || e.key === 'D') downloadCurrent();
+  else if (e.key === 'c' || e.key === 'C') copyCurrentURL();
+  else if (e.key === 'o' || e.key === 'O') openOriginal();
+  else if (e.key === ' ' && player) {
+    e.preventDefault();
+    player.playing ? player.pause() : player.play();
+  }
+  else if (e.key === 'm' || e.key === 'M') {
+    if (player) player.muted = !player.muted;
+  }
+  else if (e.key === 'ArrowUp' && player) {
+    e.preventDefault();
+    player.volume = Math.min(1, player.volume + 0.1);
+  }
+  else if (e.key === 'ArrowDown' && player) {
+    e.preventDefault();
+    player.volume = Math.max(0, player.volume - 0.1);
+  }
+});
 
-// Close autocomplete on outside click
+// Modals
+document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) backdrop.classList.remove('active');
+  });
+  backdrop.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => backdrop.classList.remove('active'));
+  });
+});
+
+$('blacklistBtn').addEventListener('click', () => openModal('blacklistModal'));
+$('shortcutsBtn').addEventListener('click', () => openModal('shortcutsModal'));
+$('debugBtn').addEventListener('click', toggleDebug);
+
+$('blacklistAdd').addEventListener('click', () => {
+  const input = $('blacklistInput');
+  const tag = input.value.trim().toLowerCase();
+  if (tag && !state.blacklist.includes(tag)) {
+    state.blacklist.push(tag);
+    saveBlacklist();
+    input.value = '';
+    renderBlacklistModal();
+    toast('success', 'Added to blacklist', tag);
+  }
+});
+
+$('blacklistInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('blacklistAdd').click();
+});
+
+// Outside click to close autocomplete
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) autocompleteEl.classList.remove('active');
 });
+
+// Scroll to top
+const scrollTopBtn = $('scrollTop');
+window.addEventListener('scroll', () => {
+  scrollTopBtn.classList.toggle('visible', window.scrollY > 500);
+}, { passive: true });
+
+scrollTopBtn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Update debug periodically
+setInterval(() => {
+  if (state.debug) updateDebug();
+}, 1000);
+
+// ── INIT ──
+loadState();
+renderFiltersUI();
+$('debugOverlay').classList.toggle('active', state.debug);
+$('debugBtn').classList.toggle('active', state.debug);
+parseURL();
+setupInfiniteScroll();
+
+if (state.tags.length) {
+  fetchPosts();
+} else {
+  gallery.innerHTML = emptyHTML();
+}
+
+// Debug interval
+setInterval(updateDebug, 2000);
+
 </script>
 </body>
 </html>
